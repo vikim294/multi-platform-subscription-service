@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "MPSS Page Analyzer",
+  "description": "Extract visible social page content and send it to MPSS for AI analysis.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "MPSS AI 分析"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "permissions": ["activeTab", "sidePanel", "storage", "tabs"],
+  "host_permissions": [
+    "https://*.weibo.com/*",
+    "https://s.weibo.com/*",
+    "https://*.xiaohongshu.com/*",
+    "https://*.douyin.com/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["injected-network.js"],
+      "matches": ["https://*.douyin.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.weibo.com/*", "https://s.weibo.com/*", "https://*.xiaohongshu.com/*", "https://*.douyin.com/*"],
+      "js": [
+        "content-script.js",
+        "adapters/shared.js",
+        "adapters/fallback.js",
+        "adapters/xiaohongshu.js",
+        "adapters/weibo.js",
+        "adapters/douyin.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

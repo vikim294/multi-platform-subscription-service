@@ -14,6 +14,7 @@ import {
 } from '../controllers/user/notification.controller.js';
 import {
   askComments,
+  askExtension,
   askSearch,
   getPostComments,
   getSearchHistories,
@@ -47,6 +48,7 @@ userRoutes.get('/search-histories', getSearchHistories);
 userRoutes.delete('/search-histories', removeAllSearchHistories);
 userRoutes.delete('/search-histories/:id', removeSearchHistory);
 userRoutes.post('/comments/ask', limitAi, askComments);
+userRoutes.post('/extension/analysis', limitAi, askExtension);
 
 userRoutes.get('/notifications/unread', listUnreadNotifications);
 userRoutes.patch('/notifications/:id/read', markNotificationRead);

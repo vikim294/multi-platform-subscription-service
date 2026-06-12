@@ -7,13 +7,15 @@
   "packageManager": "pnpm@9.15.4",
   "workspaces": [
     "server",
-    "client"
+    "client",
+    "browser-extension"
   ],
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "dev:server": "pnpm --filter @mpss/server dev",
     "dev:client": "pnpm --filter @mpss/client dev",
     "build": "pnpm --filter @mpss/client build",
+    "build:extension": "pnpm --filter @mpss/browser-extension build",
     "start": "pnpm --filter @mpss/server start",
     "lint": "pnpm -r lint",
     "db:migrate": "pnpm --filter @mpss/server db:migrate",

@@ -1,0 +1,83 @@
+html,
+body,
+#root {
+  min-width: 420px;
+  min-height: 640px;
+  margin: 0;
+}
+
+body {
+  background: #f8fafc;
+}
+
+.extension-shell {
+  width: min(100vw, 520px);
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.item-card {
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.item-card:hover {
+  border-color: #74c0fc;
+  box-shadow: 0 8px 20px rgb(15 23 42 / 8%);
+  transform: translateY(-1px);
+}
+
+.markdown-content {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #111827;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content pre {
+  margin: 0 0 10px;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 20px;
+}
+
+.markdown-content li + li {
+  margin-top: 4px;
+}
+
+.markdown-content code {
+  border-radius: 4px;
+  background: #eef2ff;
+  padding: 1px 4px;
+  color: #1e40af;
+  font-size: 12px;
+}
+
+.markdown-content pre {
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #0f172a;
+  padding: 10px;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+  color: #e5e7eb;
+  white-space: pre;
+}

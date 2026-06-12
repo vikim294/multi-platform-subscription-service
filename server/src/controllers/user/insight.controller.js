@@ -1,6 +1,6 @@
 import { env } from '../../config/env.js';
 import { userRateLimit } from '../../middleware/user-rate-limit.js';
-import { askPostComments, askSearchResults } from '../../services/ai/ai-analysis.service.js';
+import { askExtensionContent, askPostComments, askSearchResults } from '../../services/ai/ai-analysis.service.js';
 import { listTargetPosts, listWeiboPostComments } from '../../services/comments/post-comment.service.js';
 import {
   clearSearchHistories,
@@ -38,6 +38,16 @@ export const askComments = async (ctx) => {
     postText: ctx.request.body.postText,
     question: ctx.request.body.question,
     comments: ctx.request.body.comments,
+  });
+};
+
+export const askExtension = async (ctx) => {
+  ctx.body = await askExtensionContent({
+    source: ctx.request.body.source,
+    pageType: ctx.request.body.pageType,
+    pageUrl: ctx.request.body.pageUrl,
+    question: ctx.request.body.question,
+    items: ctx.request.body.items,
   });
 };
 

@@ -49,6 +49,7 @@ Admin frontend: `http://localhost:5173/admin/login`
 - Users receive unread new-activity reminders, with SSE push while the user dashboard is online.
 - Users can view target stats for followers, follower growth, and post counts.
 - Users can search Weibo keywords, keep per-user search history, inspect Weibo post comments, and run AI analysis over current search results or loaded comments.
+- Browser extension can scrape visible Weibo, Xiaohongshu, and Douyin page content and send selected items to the same AI analysis backend.
 - Admin logs in with `ADMIN_TOKEN`.
 - Admin configures Weibo Cookie.
 - Admin creates and deletes targets with `name` and `platform_target_id`.
@@ -71,3 +72,13 @@ AI_TIMEOUT_MS=30000
 ```
 
 If `AI_API_KEY` is empty, analysis endpoints return `missing_ai_api_key`.
+
+## Browser Extension
+
+The Chrome MV3 extension lives in `browser-extension/` and uses React + Mantine for the side panel UI. Build it with:
+
+```bash
+pnpm build:extension
+```
+
+Then load `browser-extension/dist` in Chrome's extension page. The first version supports visible Weibo, Xiaohongshu, and Douyin search/detail/comment content.
