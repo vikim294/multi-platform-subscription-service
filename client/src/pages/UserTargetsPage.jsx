@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearUserToken } from '../api/http.js';
 import { userApi } from '../api/user.js';
 import { TargetStatsModal } from '../components/TargetStatsModal.jsx';
+import { WeiboInsightsPanel } from '../components/WeiboInsightsPanel.jsx';
 import { useNotificationStream } from '../hooks/useNotificationStream.js';
 import { getPlatformLabel, getTimeLabel } from '../utils/platform.js';
 
@@ -254,6 +255,7 @@ export const UserTargetsPage = () => {
             </Table>
           </Table.ScrollContainer>
         </Paper>
+        <WeiboInsightsPanel targets={targets} />
       </div>
 
       <Modal

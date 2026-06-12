@@ -42,11 +42,12 @@ http.interceptors.response.use(
   (error) => {
     const url = error.config?.url || '';
     const isAuthRequest = url.startsWith('/auth/');
+    const isUnauthorized = error.response?.data?.error === 'Unauthorized';
 
-    if (error.response?.status === 401 && url.startsWith('/admin')) {
+    if (error.response?.status === 401 && isUnauthorized && url.startsWith('/admin')) {
       clearAdminToken();
       window.location.href = '/admin/login';
-    } else if (error.response?.status === 401 && !isAuthRequest) {
+    } else if (error.response?.status === 401 && isUnauthorized && !isAuthRequest) {
       clearUserToken();
       window.location.href = '/login';
     }

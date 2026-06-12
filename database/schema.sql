@@ -56,6 +56,24 @@ CREATE TABLE IF NOT EXISTS `user_subscriptions` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `user_search_histories` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `platform` ENUM('weibo', 'xiaohongshu', 'douyin') NOT NULL DEFAULT 'weibo',
+  `keyword` VARCHAR(128) NOT NULL,
+  `search_count` INT UNSIGNED NOT NULL DEFAULT 1,
+  `last_searched_at` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_search_histories_user_platform_keyword` (`user_id`, `platform`, `keyword`),
+  KEY `idx_user_search_histories_user_last` (`user_id`, `last_searched_at`),
+  CONSTRAINT `fk_user_search_histories_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `activities` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `target_id` BIGINT UNSIGNED NOT NULL,

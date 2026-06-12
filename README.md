@@ -48,6 +48,7 @@ Admin frontend: `http://localhost:5173/admin/login`
 - Users subscribe/unsubscribe targets and view latest or all activities.
 - Users receive unread new-activity reminders, with SSE push while the user dashboard is online.
 - Users can view target stats for followers, follower growth, and post counts.
+- Users can search Weibo keywords, keep per-user search history, inspect Weibo post comments, and run AI analysis over current search results or loaded comments.
 - Admin logs in with `ADMIN_TOKEN`.
 - Admin configures Weibo Cookie.
 - Admin creates and deletes targets with `name` and `platform_target_id`.
@@ -57,3 +58,16 @@ Admin frontend: `http://localhost:5173/admin/login`
 - Activities are deduplicated by `platform + platform_activity_id`.
 - Daily scheduler persists multiple rounds into `schedule_tasks`, defaults to 6 rounds per day, and each task fetches one target at a randomized time.
 - Admin can view today's schedule rounds and per-target fetch plans.
+
+## AI Analysis
+
+Keyword search and comment analysis use an OpenAI-compatible Chat Completions API. Configure these only when AI analysis is needed:
+
+```bash
+AI_BASE_URL=https://api.deepseek.com
+AI_MODEL=deepseek-chat
+AI_API_KEY=
+AI_TIMEOUT_MS=30000
+```
+
+If `AI_API_KEY` is empty, analysis endpoints return `missing_ai_api_key`.

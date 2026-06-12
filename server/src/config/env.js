@@ -44,4 +44,24 @@ export const env = {
   schedulerMinTaskGapMs: toInt(process.env.SCHEDULER_MIN_TASK_GAP_MS, 10000),
   schedulerMinRoundGapMs: toInt(process.env.SCHEDULER_MIN_ROUND_GAP_MS, 3600000),
   schedulerRoundWindowMs: toInt(process.env.SCHEDULER_ROUND_WINDOW_MS, 3600000),
+  ai: {
+    apiKey: process.env.AI_API_KEY || '',
+    baseUrl: (process.env.AI_BASE_URL || 'https://api.deepseek.com').replace(/\/+$/, ''),
+    model: process.env.AI_MODEL || 'deepseek-chat',
+    timeoutMs: toInt(process.env.AI_TIMEOUT_MS, 30000),
+  },
+  rateLimits: {
+    search: {
+      windowMs: toInt(process.env.RATE_LIMIT_SEARCH_WINDOW_MS, 10 * 60 * 1000),
+      max: toInt(process.env.RATE_LIMIT_SEARCH_MAX, 10),
+    },
+    comments: {
+      windowMs: toInt(process.env.RATE_LIMIT_COMMENTS_WINDOW_MS, 10 * 60 * 1000),
+      max: toInt(process.env.RATE_LIMIT_COMMENTS_MAX, 20),
+    },
+    ai: {
+      windowMs: toInt(process.env.RATE_LIMIT_AI_WINDOW_MS, 60 * 60 * 1000),
+      max: toInt(process.env.RATE_LIMIT_AI_MAX, 20),
+    },
+  },
 };

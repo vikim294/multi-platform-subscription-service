@@ -33,6 +33,38 @@ export const userApi = {
     const { data } = await http.get(`/targets/${targetId}/stats`, { params });
     return data;
   },
+  searchContent: async (params = {}) => {
+    const { data } = await http.get('/search', { params });
+    return data;
+  },
+  askSearch: async (payload) => {
+    const { data } = await http.post('/search/ask', payload);
+    return data;
+  },
+  listSearchHistories: async (params = {}) => {
+    const { data } = await http.get('/search-histories', { params });
+    return data;
+  },
+  deleteSearchHistory: async (historyId) => {
+    const { data } = await http.delete(`/search-histories/${historyId}`);
+    return data;
+  },
+  clearSearchHistories: async () => {
+    const { data } = await http.delete('/search-histories');
+    return data;
+  },
+  listTargetPosts: async (targetId, params = {}) => {
+    const { data } = await http.get(`/targets/${targetId}/posts`, { params });
+    return data;
+  },
+  listPostComments: async (targetId, postId, params = {}) => {
+    const { data } = await http.get(`/targets/${targetId}/posts/${postId}/comments`, { params });
+    return data;
+  },
+  askComments: async (payload) => {
+    const { data } = await http.post('/comments/ask', payload);
+    return data;
+  },
   listUnreadNotifications: async () => {
     const { data } = await http.get('/notifications/unread');
     return data;

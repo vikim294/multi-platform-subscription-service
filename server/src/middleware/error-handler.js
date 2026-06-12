@@ -10,7 +10,7 @@ export const errorHandler = async (ctx, next) => {
 
     ctx.status = error.status || error.statusCode || 500;
     ctx.body = {
-      error: ctx.status >= 500 ? 'Internal server error' : error.message,
+      error: ctx.status >= 500 && !error.expose ? 'Internal server error' : error.message,
       details: process.env.NODE_ENV === 'development' ? error.message : undefined,
     };
 

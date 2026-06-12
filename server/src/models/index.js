@@ -6,6 +6,7 @@ import { initPlatformToken, PlatformToken } from './platform-token.model.js';
 import { initScheduleTask, ScheduleTask } from './schedule-task.model.js';
 import { initTarget, Target } from './target.model.js';
 import { initTargetFollowerStat, TargetFollowerStat } from './target-follower-stat.model.js';
+import { initUserSearchHistory, UserSearchHistory } from './user-search-history.model.js';
 import { initUser, User } from './user.model.js';
 import { initUserSubscription, UserSubscription } from './user-subscription.model.js';
 
@@ -17,6 +18,7 @@ initActivity(sequelize);
 initActivityNotification(sequelize);
 initFetchLog(sequelize);
 initUserSubscription(sequelize);
+initUserSearchHistory(sequelize);
 initScheduleTask(sequelize);
 
 Target.hasMany(Activity, { foreignKey: 'targetId', as: 'activities' });
@@ -56,6 +58,9 @@ UserSubscription.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 Target.hasMany(UserSubscription, { foreignKey: 'targetId', as: 'subscriptions' });
 UserSubscription.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
 
+User.hasMany(UserSearchHistory, { foreignKey: 'userId', as: 'searchHistories' });
+UserSearchHistory.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 export {
   sequelize,
   Activity,
@@ -66,5 +71,6 @@ export {
   Target,
   TargetFollowerStat,
   User,
+  UserSearchHistory,
   UserSubscription,
 };
