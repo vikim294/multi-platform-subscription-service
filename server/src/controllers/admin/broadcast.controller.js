@@ -9,6 +9,7 @@ export const broadcastTestNewActivity = async (ctx) => {
     content: '这是一条仅用于测试 SSE 在线提醒的假动态，不会写入未读列表。',
     sourceUrl: null,
     publishedAt: new Date().toISOString(),
+    publishedAtSource: 'fetched_at',
     test: true,
   });
 

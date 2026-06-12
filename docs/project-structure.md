@@ -49,6 +49,7 @@ mpss/
           scheduler.service.js
         platforms/
           weibo.adapter.js
+          xiaohongshu.adapter.js
       middleware/
         admin-auth.js
         error-handler.js

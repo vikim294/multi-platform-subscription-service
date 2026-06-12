@@ -22,7 +22,7 @@ import { clearAdminToken } from '../api/http.js';
 
 const navItems = [
   { label: '概览', to: '/admin', icon: IconHome },
-  { label: '微博 Cookie', to: '/admin/platform-token', icon: IconKey },
+  { label: '平台 Cookie', to: '/admin/platform-token', icon: IconKey },
   { label: '订阅目标', to: '/admin/targets', icon: IconDatabase },
   { label: '定时任务', to: '/admin/scheduler', icon: IconCalendarTime },
   { label: '抓取日志', to: '/admin/fetch-logs', icon: IconActivity },

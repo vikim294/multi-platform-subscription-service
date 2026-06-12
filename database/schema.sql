@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `activities` (
   `source_url` VARCHAR(1024) NULL,
   `raw_payload` JSON NULL,
   `published_at` DATETIME NULL,
+  `published_at_source` ENUM('platform', 'fetched_at') NOT NULL DEFAULT 'platform',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

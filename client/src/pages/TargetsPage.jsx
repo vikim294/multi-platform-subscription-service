@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { adminApi } from '../api/admin.js';
 import { TargetForm } from '../components/TargetForm.jsx';
+import { getPlatformLabel } from '../utils/platform.js';
 
 export const TargetsPage = () => {
   const [data, setData] = useState({ items: [], total: 0 });
@@ -114,7 +115,7 @@ export const TargetsPage = () => {
                 <Table.Tr key={target.id}>
                   <Table.Td>{target.id}</Table.Td>
                   <Table.Td>
-                    <Badge>weibo</Badge>
+                    <Badge>{getPlatformLabel(target.platform)}</Badge>
                   </Table.Td>
                   <Table.Td>{target.name}</Table.Td>
                   <Table.Td>{target.platformTargetId}</Table.Td>

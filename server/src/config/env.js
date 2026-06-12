@@ -36,6 +36,7 @@ export const env = {
     password: process.env.DB_PASSWORD || '',
   },
   weiboBaseUrl: process.env.WEIBO_BASE_URL || 'https://weibo.com',
+  xiaohongshuBaseUrl: process.env.XIAOHONGSHU_BASE_URL || 'https://www.xiaohongshu.com',
   fetchCron: process.env.FETCH_CRON || '0 0 * * *',
   fetchMinDelaySeconds: toInt(process.env.FETCH_MIN_DELAY_SECONDS, 5),
   fetchMaxDelaySeconds: toInt(process.env.FETCH_MAX_DELAY_SECONDS, 60),

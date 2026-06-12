@@ -1,9 +1,11 @@
 import { Activity, FetchLog, PlatformToken } from '../../models/index.js';
 import { notifyNewActivity } from '../notifications/activity-notification.service.js';
 import { fetchWeiboTargetPage } from '../platforms/weibo.adapter.js';
+import { fetchXiaohongshuTargetPage } from '../platforms/xiaohongshu.adapter.js';
 
 const getAdapter = (platform) => {
   if (platform === 'weibo') return fetchWeiboTargetPage;
+  if (platform === 'xiaohongshu') return fetchXiaohongshuTargetPage;
   throw Object.assign(new Error(`Unsupported platform: ${platform}`), { status: 400 });
 };
 
@@ -37,7 +39,7 @@ export const fetchTarget = async (target) => {
   }
 
   try {
-    const activities = await adapter({ target, cookie: token.cookie, page: 1 });
+    const activities = await adapter({ target, cookie: token.cookie, page: 1, fetchedAt: startedAt });
     let insertedCount = 0;
 
     for (const activity of activities) {

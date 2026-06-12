@@ -6,7 +6,7 @@ import { replanPendingFutureRounds } from '../../services/fetch/scheduler.servic
 export const createTargetSchema = Joi.object({
   name: Joi.string().trim().min(1).max(255).required(),
   platformTargetId: Joi.string().trim().min(1).max(128).required(),
-  platform: Joi.string().valid('weibo').default('weibo'),
+  platform: Joi.string().valid('weibo', 'xiaohongshu').default('weibo'),
 });
 
 const toInt = (value, fallback) => {
@@ -109,6 +109,7 @@ export const listActivities = async (ctx) => {
       content: activity.content,
       sourceUrl: activity.sourceUrl,
       publishedAt: activity.publishedAt,
+      publishedAtSource: activity.publishedAtSource,
     })),
     page,
     pageSize,

@@ -30,9 +30,9 @@ export const listPlatformTokens = async (ctx) => {
 
 export const upsertPlatformToken = async (ctx) => {
   const platform = ctx.params.platform;
-  if (!['weibo'].includes(platform)) {
+  if (!['weibo', 'xiaohongshu'].includes(platform)) {
     ctx.status = 400;
-    ctx.body = { error: 'Only weibo is supported in MVP' };
+    ctx.body = { error: 'Unsupported platform' };
     return;
   }
 

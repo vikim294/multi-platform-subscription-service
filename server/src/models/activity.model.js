@@ -53,6 +53,12 @@ export const initActivity = (sequelize) => {
         allowNull: true,
         field: 'published_at',
       },
+      publishedAtSource: {
+        type: DataTypes.ENUM('platform', 'fetched_at'),
+        allowNull: false,
+        defaultValue: 'platform',
+        field: 'published_at_source',
+      },
     },
     {
       sequelize,

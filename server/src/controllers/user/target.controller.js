@@ -17,6 +17,7 @@ const serializeActivity = (activity) => {
     content: activity.content,
     sourceUrl: activity.sourceUrl,
     publishedAt: activity.publishedAt,
+    publishedAtSource: activity.publishedAtSource,
   };
 };
 

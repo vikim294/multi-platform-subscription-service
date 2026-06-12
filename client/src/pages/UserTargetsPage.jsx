@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearUserToken } from '../api/http.js';
 import { userApi } from '../api/user.js';
 import { useNotificationStream } from '../hooks/useNotificationStream.js';
+import { getPlatformLabel, getTimeLabel } from '../utils/platform.js';
 
 const ActivityPreview = ({ activity }) => {
   if (!activity) {
@@ -37,7 +38,7 @@ const ActivityPreview = ({ activity }) => {
       </Text>
       <Group gap="sm">
         <Text c="dimmed" size="xs">
-          {activity.publishedAt ? dayjs(activity.publishedAt).format('YYYY-MM-DD HH:mm') : '未知时间'}
+          {getTimeLabel(activity)}：{activity.publishedAt ? dayjs(activity.publishedAt).format('YYYY-MM-DD HH:mm') : '未知时间'}
         </Text>
         {activity.sourceUrl && (
           <Anchor href={activity.sourceUrl} target="_blank" size="xs">
@@ -176,7 +177,7 @@ export const UserTargetsPage = () => {
                       </Stack>
                     </Table.Td>
                     <Table.Td>
-                      <Badge variant="light">weibo</Badge>
+                      <Badge variant="light">{getPlatformLabel(target.platform)}</Badge>
                     </Table.Td>
                     <Table.Td maw={440}>
                       <ActivityPreview activity={target.latestActivity} />
@@ -226,7 +227,7 @@ export const UserTargetsPage = () => {
                   <Text size="sm">{activity.content || '-'}</Text>
                   <Group justify="space-between">
                     <Text c="dimmed" size="xs">
-                      {activity.publishedAt ? dayjs(activity.publishedAt).format('YYYY-MM-DD HH:mm') : '未知时间'}
+                      {getTimeLabel(activity)}：{activity.publishedAt ? dayjs(activity.publishedAt).format('YYYY-MM-DD HH:mm') : '未知时间'}
                     </Text>
                     {activity.sourceUrl && (
                       <Anchor href={activity.sourceUrl} target="_blank" size="sm">

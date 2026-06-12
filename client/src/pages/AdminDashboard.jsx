@@ -15,6 +15,7 @@ import { IconPlayerPlay } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { adminApi } from '../api/admin.js';
+import { getTimeLabel } from '../utils/platform.js';
 
 export const AdminDashboard = () => {
   const [targets, setTargets] = useState({ total: 0, items: [] });
@@ -130,7 +131,14 @@ export const AdminDashboard = () => {
                       {item.content || '-'}
                     </Text>
                   </Table.Td>
-                  <Table.Td>{item.publishedAt ? dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm') : '-'}</Table.Td>
+                  <Table.Td>
+                    <Stack gap={2}>
+                      <Text size="sm">{item.publishedAt ? dayjs(item.publishedAt).format('YYYY-MM-DD HH:mm') : '-'}</Text>
+                      <Text c="dimmed" size="xs">
+                        {getTimeLabel(item)}
+                      </Text>
+                    </Stack>
+                  </Table.Td>
                   <Table.Td>
                     {item.sourceUrl ? (
                       <Anchor href={item.sourceUrl} target="_blank" size="sm">

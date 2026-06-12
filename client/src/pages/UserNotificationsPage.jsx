@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearUserToken } from '../api/http.js';
 import { userApi } from '../api/user.js';
 import { useNotificationStream } from '../hooks/useNotificationStream.js';
+import { getTimeLabel } from '../utils/platform.js';
 
 export const UserNotificationsPage = () => {
   const [data, setData] = useState({ unreadCount: 0, items: [] });
@@ -143,6 +144,7 @@ export const UserNotificationsPage = () => {
                     <div>
                       <Text fw={700}>{item.target?.name || '订阅目标'}</Text>
                       <Text c="dimmed" size="xs">
+                        {getTimeLabel(item.activity)}：
                         {item.activity?.publishedAt
                           ? dayjs(item.activity.publishedAt).format('YYYY-MM-DD HH:mm')
                           : dayjs(item.createdAt).format('YYYY-MM-DD HH:mm')}

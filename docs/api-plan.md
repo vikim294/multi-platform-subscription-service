@@ -451,3 +451,37 @@ Deduplication key:
 ```text
 platform + platform_activity_id
 ```
+
+## Xiaohongshu Adapter Contract
+
+Request:
+
+```http
+GET https://www.xiaohongshu.com/user/profile/<platformTargetId>
+Cookie: <admin configured cookie>
+```
+
+The adapter parses SSR HTML from `window.__INITIAL_STATE__`, reads `user.notes[0]`, and normalizes each note into the internal activity shape.
+
+Important time behavior:
+
+- Xiaohongshu SSR profile HTML does not provide a reliable publish time in the parsed note list.
+- `publishedAt` is set to the fetch time.
+- `publishedAtSource` is set to `fetched_at`.
+- UI should show this as `抓取时间`, not platform publish time.
+
+Normalized activity shape:
+
+```json
+{
+  "platform": "xiaohongshu",
+  "platformActivityId": "note id",
+  "authorPlatformId": "小红书 user_id",
+  "authorName": "小红书昵称",
+  "content": "笔记标题",
+  "sourceUrl": "https://www.xiaohongshu.com/explore/<note id>",
+  "publishedAt": "抓取时间",
+  "publishedAtSource": "fetched_at",
+  "rawPayload": {}
+}
+```

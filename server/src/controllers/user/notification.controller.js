@@ -20,6 +20,7 @@ const serializeNotification = (notification) => ({
         content: notification.activity.content,
         sourceUrl: notification.activity.sourceUrl,
         publishedAt: notification.activity.publishedAt,
+        publishedAtSource: notification.activity.publishedAtSource,
       }
     : null,
 });
@@ -36,7 +37,7 @@ export const listUnreadNotifications = async (ctx) => {
       order: [['id', 'DESC']],
       include: [
         { model: Target, as: 'target', attributes: ['id', 'name', 'platform', 'platformTargetId'] },
-        { model: Activity, as: 'activity', attributes: ['id', 'content', 'sourceUrl', 'publishedAt'] },
+        { model: Activity, as: 'activity', attributes: ['id', 'content', 'sourceUrl', 'publishedAt', 'publishedAtSource'] },
       ],
     }),
     ActivityNotification.count({ where }),
