@@ -5,6 +5,12 @@ import {
   subscribeTarget,
   unsubscribeTarget,
 } from '../controllers/user/target.controller.js';
+import {
+  listUnreadNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+  streamNotifications,
+} from '../controllers/user/notification.controller.js';
 import { userAuth } from '../middleware/user-auth.js';
 
 export const userRoutes = new Router({
@@ -17,3 +23,8 @@ userRoutes.get('/targets', listUserTargets);
 userRoutes.post('/subscriptions/:id', subscribeTarget);
 userRoutes.delete('/subscriptions/:id', unsubscribeTarget);
 userRoutes.get('/targets/:id/activities', listTargetActivities);
+
+userRoutes.get('/notifications/unread', listUnreadNotifications);
+userRoutes.patch('/notifications/:id/read', markNotificationRead);
+userRoutes.patch('/notifications/read-all', markAllNotificationsRead);
+userRoutes.get('/notifications/stream', streamNotifications);

@@ -37,6 +37,14 @@ export const adminApi = {
     const { data } = await http.get('/admin/fetch-logs', { params });
     return data;
   },
+  getTodaySchedule: async () => {
+    const { data } = await http.get('/admin/scheduler/today');
+    return data;
+  },
+  broadcastTestNewActivity: async () => {
+    const { data } = await http.post('/admin/broadcast/test-new-activity');
+    return data;
+  },
   listActivities: async (params = {}) => {
     const { data } = await http.get('/admin/activities', { params });
     return data;

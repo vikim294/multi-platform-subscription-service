@@ -113,6 +113,56 @@ Unsubscribes current user from a target.
 
 Returns activities for one target.
 
+## User Notifications
+
+New activity reminders are persisted as unread notifications and pushed to online users through SSE.
+
+### GET `/notifications/unread`
+
+Returns unread notification count and unread cards.
+
+Response:
+
+```json
+{
+  "unreadCount": 1,
+  "items": [
+    {
+      "id": 1,
+      "readAt": null,
+      "target": {
+        "id": 1,
+        "name": "目标账号"
+      },
+      "activity": {
+        "id": 10,
+        "content": "微博正文",
+        "sourceUrl": "https://weibo.com/1234567890/xxx",
+        "publishedAt": "2026-06-12T00:00:00.000Z"
+      }
+    }
+  ]
+}
+```
+
+### PATCH `/notifications/:id/read`
+
+Marks one unread notification as read.
+
+### PATCH `/notifications/read-all`
+
+Marks all current user's unread notifications as read.
+
+### GET `/notifications/stream?token=<JWT>`
+
+SSE stream for online user dashboards. `EventSource` cannot send custom auth headers, so this endpoint accepts the JWT through the `token` query parameter.
+
+Event:
+
+```text
+event: new-activity
+```
+
 ## Admin Platform Tokens
 
 ### GET `/admin/platform-tokens`
@@ -286,6 +336,58 @@ Response:
   "total": 1
 }
 ```
+
+## Admin Scheduler
+
+### GET `/admin/scheduler/today`
+
+Returns today's persistent schedule grouped by round.
+
+Response:
+
+```json
+{
+  "date": "2026-06-12",
+  "summary": {
+    "total": 18,
+    "pending": 12,
+    "running": 0,
+    "success": 6,
+    "failed": 0,
+    "skipped": 0
+  },
+  "rounds": [
+    {
+      "roundIndex": 1,
+      "tasks": [
+        {
+          "id": 1,
+          "targetId": 1,
+          "targetName": "目标账号",
+          "platformTargetId": "1234567890",
+          "platform": "weibo",
+          "scheduledAt": "2026-06-12T00:03:10.000Z",
+          "status": "pending",
+          "fetchedCount": 0,
+          "insertedCount": 0,
+          "message": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+Scheduler rules:
+
+- Default `SCHEDULER_ROUNDS_PER_DAY=6`.
+- Each schedule task fetches exactly one target.
+- Targets within a round are randomly spread across `SCHEDULER_ROUND_WINDOW_MS`.
+- Adjacent target tasks within one round are strictly greater than `SCHEDULER_MIN_TASK_GAP_MS`.
+- Adjacent round starts are strictly greater than `SCHEDULER_MIN_ROUND_GAP_MS`.
+- Plans are persisted to `schedule_tasks`.
+- Service restart fills missing future plans but does not reset existing tasks.
+- Target create/delete replans only future rounds whose tasks are still all `pending`.
 
 ## Admin Activities
 

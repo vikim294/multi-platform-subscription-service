@@ -46,9 +46,11 @@ Admin frontend: `http://localhost:5173/admin/login`
 
 - Users register/login with 6+ character alphanumeric account and password.
 - Users subscribe/unsubscribe targets and view latest or all activities.
+- Users receive unread new-activity reminders, with SSE push while the user dashboard is online.
 - Admin logs in with `ADMIN_TOKEN`.
 - Admin configures Weibo Cookie.
 - Admin creates and deletes targets with `name` and `platform_target_id`.
 - Server fetches page 1 of Weibo `/ajax/statuses/mymblog`.
 - Activities are deduplicated by `platform + platform_activity_id`.
-- Daily scheduler runs at `00:00` and fetches targets sequentially with a random delay in `[5s, 60s]`.
+- Daily scheduler persists multiple rounds into `schedule_tasks`, defaults to 6 rounds per day, and each task fetches one target at a randomized time.
+- Admin can view today's schedule rounds and per-target fetch plans.

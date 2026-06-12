@@ -39,4 +39,8 @@ export const env = {
   fetchCron: process.env.FETCH_CRON || '0 0 * * *',
   fetchMinDelaySeconds: toInt(process.env.FETCH_MIN_DELAY_SECONDS, 5),
   fetchMaxDelaySeconds: toInt(process.env.FETCH_MAX_DELAY_SECONDS, 60),
+  schedulerRoundsPerDay: toInt(process.env.SCHEDULER_ROUNDS_PER_DAY, 6),
+  schedulerMinTaskGapMs: toInt(process.env.SCHEDULER_MIN_TASK_GAP_MS, 10000),
+  schedulerMinRoundGapMs: toInt(process.env.SCHEDULER_MIN_ROUND_GAP_MS, 3600000),
+  schedulerRoundWindowMs: toInt(process.env.SCHEDULER_ROUND_WINDOW_MS, 3600000),
 };

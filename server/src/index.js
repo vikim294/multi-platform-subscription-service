@@ -12,4 +12,4 @@ app.listen(env.port, () => {
   logger.info(`Server listening on http://localhost:${env.port}`);
 });
 
-startScheduler();
+await startScheduler();

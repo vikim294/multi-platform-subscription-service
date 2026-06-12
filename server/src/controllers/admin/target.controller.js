@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { Op } from 'sequelize';
 import { Activity, Target } from '../../models/index.js';
+import { replanPendingFutureRounds } from '../../services/fetch/scheduler.service.js';
 
 export const createTargetSchema = Joi.object({
   name: Joi.string().trim().min(1).max(255).required(),
@@ -52,6 +53,7 @@ export const listTargets = async (ctx) => {
 
 export const createTarget = async (ctx) => {
   const target = await Target.create(ctx.request.body);
+  await replanPendingFutureRounds();
 
   ctx.status = 201;
   ctx.body = {
@@ -73,6 +75,7 @@ export const deleteTarget = async (ctx) => {
   }
 
   await target.destroy();
+  await replanPendingFutureRounds();
   ctx.body = { ok: true };
 };
 

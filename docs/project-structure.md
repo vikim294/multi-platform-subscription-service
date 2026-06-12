@@ -25,7 +25,9 @@ mpss/
         platform-token.model.js
         target.model.js
         activity.model.js
+        activity-notification.model.js
         fetch-log.model.js
+        schedule-task.model.js
       routes/
         auth.routes.js
         user.routes.js
@@ -35,8 +37,13 @@ mpss/
         admin/
           platform-token.controller.js
           target.controller.js
+          notification.controller.js
           fetch.controller.js
+          scheduler.controller.js
       services/
+        notifications/
+          activity-notification.service.js
+          sse-hub.service.js
         fetch/
           fetch-target.service.js
           scheduler.service.js
@@ -62,11 +69,13 @@ mpss/
       pages/
         UserAuthPage.jsx
         UserTargetsPage.jsx
+        UserNotificationsPage.jsx
         AdminLogin.jsx
         AdminDashboard.jsx
         PlatformTokenPage.jsx
         TargetsPage.jsx
         FetchLogsPage.jsx
+        SchedulerPage.jsx
       components/
         AppShellLayout.jsx
         TargetForm.jsx

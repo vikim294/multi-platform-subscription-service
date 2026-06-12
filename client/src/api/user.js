@@ -29,4 +29,16 @@ export const userApi = {
     const { data } = await http.get(`/targets/${targetId}/activities`, { params });
     return data;
   },
+  listUnreadNotifications: async () => {
+    const { data } = await http.get('/notifications/unread');
+    return data;
+  },
+  markNotificationRead: async (notificationId) => {
+    const { data } = await http.patch(`/notifications/${notificationId}/read`);
+    return data;
+  },
+  markAllNotificationsRead: async () => {
+    const { data } = await http.patch('/notifications/read-all');
+    return data;
+  },
 };

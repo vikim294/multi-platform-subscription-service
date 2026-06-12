@@ -9,7 +9,14 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconActivity, IconDatabase, IconHome, IconKey, IconLogout } from '@tabler/icons-react';
+import {
+  IconActivity,
+  IconCalendarTime,
+  IconDatabase,
+  IconHome,
+  IconKey,
+  IconLogout,
+} from '@tabler/icons-react';
 import { NavLink as RouterNavLink, useLocation, useNavigate } from 'react-router-dom';
 import { clearAdminToken } from '../api/http.js';
 
@@ -17,6 +24,7 @@ const navItems = [
   { label: '概览', to: '/admin', icon: IconHome },
   { label: '微博 Cookie', to: '/admin/platform-token', icon: IconKey },
   { label: '订阅目标', to: '/admin/targets', icon: IconDatabase },
+  { label: '定时任务', to: '/admin/scheduler', icon: IconCalendarTime },
   { label: '抓取日志', to: '/admin/fetch-logs', icon: IconActivity },
 ];
 

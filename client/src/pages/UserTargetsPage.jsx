@@ -2,6 +2,7 @@ import {
   Anchor,
   Badge,
   Button,
+  Indicator,
   Group,
   Modal,
   Paper,
@@ -14,10 +15,11 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconBell, IconBellOff, IconLogout, IconRefresh, IconTimeline } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clearUserToken } from '../api/http.js';
 import { userApi } from '../api/user.js';
+import { useNotificationStream } from '../hooks/useNotificationStream.js';
 
 const ActivityPreview = ({ activity }) => {
   if (!activity) {
@@ -52,17 +54,32 @@ export const UserTargetsPage = () => {
   const [loadingTargetId, setLoadingTargetId] = useState(null);
   const [activityData, setActivityData] = useState({ target: null, items: [] });
   const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
 
-  const loadTargets = async () => {
+  const loadTargets = useCallback(async () => {
     const data = await userApi.listTargets();
     setTargets(data.items);
-  };
+  }, []);
+
+  const loadUnreadCount = useCallback(async () => {
+    const data = await userApi.listUnreadNotifications();
+    setUnreadCount(data.unreadCount);
+  }, []);
 
   useEffect(() => {
-    loadTargets().catch((error) => notifications.show({ color: 'red', message: error.message }));
-  }, []);
+    Promise.all([loadTargets(), loadUnreadCount()]).catch((error) =>
+      notifications.show({ color: 'red', message: error.message }),
+    );
+  }, [loadTargets, loadUnreadCount]);
+
+  const handleNewActivity = useCallback(() => {
+    setUnreadCount((count) => count + 1);
+    loadTargets().catch(() => {});
+  }, [loadTargets]);
+
+  useNotificationStream(handleNewActivity);
 
   const toggleSubscription = async (target) => {
     setLoadingTargetId(target.id);
@@ -114,6 +131,11 @@ export const UserTargetsPage = () => {
             </Text>
           </div>
           <Group>
+            <Indicator label={unreadCount} size={18} disabled={unreadCount === 0}>
+              <Button variant="light" leftSection={<IconBell size={18} />} onClick={() => navigate('/notifications')}>
+                消息提醒
+              </Button>
+            </Indicator>
             <Button variant="light" leftSection={<IconRefresh size={18} />} onClick={loadTargets}>
               刷新
             </Button>

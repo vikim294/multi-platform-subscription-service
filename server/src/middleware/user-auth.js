@@ -4,7 +4,8 @@ import { User } from '../models/index.js';
 
 export const userAuth = async (ctx, next) => {
   const authorization = ctx.get('authorization');
-  const [, token] = authorization.match(/^Bearer\s+(.+)$/i) || [];
+  const [, headerToken] = authorization.match(/^Bearer\s+(.+)$/i) || [];
+  const token = headerToken || ctx.query.token;
 
   if (!token) {
     ctx.status = 401;

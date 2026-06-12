@@ -1,4 +1,5 @@
 import { Activity, FetchLog, PlatformToken } from '../../models/index.js';
+import { notifyNewActivity } from '../notifications/activity-notification.service.js';
 import { fetchWeiboTargetPage } from '../platforms/weibo.adapter.js';
 
 const getAdapter = (platform) => {
@@ -55,7 +56,10 @@ export const fetchTarget = async (target) => {
         await record.update({ targetId: target.id });
       }
 
-      if (created) insertedCount += 1;
+      if (created) {
+        insertedCount += 1;
+        await notifyNewActivity({ target, activity: record });
+      }
     }
 
     await FetchLog.create({

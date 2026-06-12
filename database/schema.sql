@@ -98,3 +98,53 @@ CREATE TABLE IF NOT EXISTS `fetch_logs` (
     ON DELETE SET NULL
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `activity_notifications` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `target_id` BIGINT UNSIGNED NOT NULL,
+  `activity_id` BIGINT UNSIGNED NOT NULL,
+  `read_at` DATETIME NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_activity_notifications_user_activity` (`user_id`, `activity_id`),
+  KEY `idx_activity_notifications_user_read_created` (`user_id`, `read_at`, `created_at`),
+  CONSTRAINT `fk_activity_notifications_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_activity_notifications_target_id`
+    FOREIGN KEY (`target_id`) REFERENCES `targets` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_activity_notifications_activity_id`
+    FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `schedule_tasks` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `schedule_date` DATE NOT NULL,
+  `round_index` INT UNSIGNED NOT NULL,
+  `target_id` BIGINT UNSIGNED NOT NULL,
+  `platform` ENUM('weibo', 'xiaohongshu', 'douyin') NOT NULL,
+  `scheduled_at` DATETIME NOT NULL,
+  `status` ENUM('pending', 'running', 'success', 'failed', 'skipped') NOT NULL DEFAULT 'pending',
+  `started_at` DATETIME NULL,
+  `finished_at` DATETIME NULL,
+  `fetched_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `inserted_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `message` VARCHAR(1024) NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_schedule_tasks_date_round_target` (`schedule_date`, `round_index`, `target_id`),
+  KEY `idx_schedule_tasks_status_scheduled` (`status`, `scheduled_at`),
+  KEY `idx_schedule_tasks_date_round_time` (`schedule_date`, `round_index`, `scheduled_at`),
+  CONSTRAINT `fk_schedule_tasks_target_id`
+    FOREIGN KEY (`target_id`) REFERENCES `targets` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

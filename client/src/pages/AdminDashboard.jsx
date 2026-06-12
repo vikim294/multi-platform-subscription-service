@@ -21,6 +21,7 @@ export const AdminDashboard = () => {
   const [logs, setLogs] = useState({ total: 0, items: [] });
   const [activities, setActivities] = useState({ total: 0, items: [] });
   const [fetching, setFetching] = useState(false);
+  const [broadcasting, setBroadcasting] = useState(false);
 
   const load = async () => {
     const [targetData, logData, activityData] = await Promise.all([
@@ -51,6 +52,21 @@ export const AdminDashboard = () => {
     }
   };
 
+  const broadcastTest = async () => {
+    setBroadcasting(true);
+    try {
+      const result = await adminApi.broadcastTestNewActivity();
+      notifications.show({
+        color: 'green',
+        message: `已广播给 ${result.userCount} 个在线用户，${result.connectionCount} 个连接`,
+      });
+    } catch (error) {
+      notifications.show({ color: 'red', message: error.response?.data?.error || error.message });
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
   return (
     <Stack gap="lg">
       <Group justify="space-between" align="end">
@@ -60,9 +76,14 @@ export const AdminDashboard = () => {
             微博订阅 MVP 当前运行状态
           </Text>
         </div>
-        <Button leftSection={<IconPlayerPlay size={18} />} loading={fetching} onClick={fetchAll}>
-          抓取全部
-        </Button>
+        <Group>
+          <Button variant="light" loading={broadcasting} onClick={broadcastTest}>
+            测试广播消息
+          </Button>
+          <Button leftSection={<IconPlayerPlay size={18} />} loading={fetching} onClick={fetchAll}>
+            抓取全部
+          </Button>
+        </Group>
       </Group>
 
       <SimpleGrid cols={{ base: 1, sm: 3 }}>

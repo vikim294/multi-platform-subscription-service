@@ -13,6 +13,8 @@ export default [
       globals: {
         console: 'readonly',
         process: 'readonly',
+        clearInterval: 'readonly',
+        setInterval: 'readonly',
         setTimeout: 'readonly',
       },
     },
