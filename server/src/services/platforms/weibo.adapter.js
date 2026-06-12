@@ -69,3 +69,31 @@ export const fetchWeiboTargetPage = async ({ target, cookie, page = 1 }) => {
     }))
     .filter((activity) => activity.platformActivityId);
 };
+
+export const fetchWeiboFollowerCount = async ({ target, cookie }) => {
+  const response = await axios.get(`${env.weiboBaseUrl}/ajax/profile/info`, {
+    params: {
+      uid: target.platformTargetId,
+      scene: 'profile',
+    },
+    headers: {
+      cookie,
+      referer: `${env.weiboBaseUrl}/u/${target.platformTargetId}`,
+      'client-version': '3.0.0',
+      'user-agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36',
+      accept: 'application/json, text/plain, */*',
+    },
+    timeout: 15000,
+  });
+
+  const followersCount = Number(response.data?.data?.user?.followers_count);
+  if (!Number.isFinite(followersCount)) {
+    throw new Error(`微博粉丝数字段缺失。uid=${target.platformTargetId}`);
+  }
+
+  return {
+    followersCount,
+    rawPayload: response.data,
+  };
+};

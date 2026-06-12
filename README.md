@@ -47,6 +47,7 @@ Admin frontend: `http://localhost:5173/admin/login`
 - Users register/login with 6+ character alphanumeric account and password.
 - Users subscribe/unsubscribe targets and view latest or all activities.
 - Users receive unread new-activity reminders, with SSE push while the user dashboard is online.
+- Users can view target stats for followers, follower growth, and post counts.
 - Admin logs in with `ADMIN_TOKEN`.
 - Admin configures Weibo Cookie.
 - Admin creates and deletes targets with `name` and `platform_target_id`.

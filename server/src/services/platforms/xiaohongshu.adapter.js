@@ -35,12 +35,24 @@ const parseInitialState = (html) => {
 
 const parseUser = (userStore) => {
   const basicInfo = userStore?.userPageData?.basicInfo ?? {};
+  const interactions = userStore?.userPageData?.interactions ?? [];
   const firstNoteUser = userStore?.notes?.[0]?.find((item) => item?.noteCard?.user)?.noteCard?.user ?? {};
 
   return {
     nickname: basicInfo.nickname ?? firstNoteUser.nickname ?? firstNoteUser.nickName ?? null,
     userId: firstNoteUser.userId ?? basicInfo.redId ?? null,
+    followersCount: parseCount(interactions[1]?.count),
   };
+};
+
+const parseCount = (value) => {
+  if (typeof value === 'number') return value;
+  if (!value || typeof value !== 'string') return 0;
+  const normalized = value.trim();
+  if (normalized.endsWith('万')) {
+    return Math.round(Number(normalized.slice(0, -1)) * 10000) || 0;
+  }
+  return Number(normalized.replace(/[^\d]/g, '')) || 0;
 };
 
 const parseNotes = (state) => {
@@ -111,4 +123,27 @@ export const fetchXiaohongshuTargetPage = async ({ target, cookie, fetchedAt = n
     publishedAt: fetchedAt,
     publishedAtSource: 'fetched_at',
   }));
+};
+
+export const fetchXiaohongshuFollowerCount = async ({ target, cookie }) => {
+  const response = await client.get(`/user/profile/${encodeURIComponent(target.platformTargetId)}`, {
+    headers: {
+      cookie,
+    },
+  });
+
+  const state = parseInitialState(response.data);
+  const { user } = parseNotes(state);
+  const followersCount = Number(user.followersCount);
+
+  if (!Number.isFinite(followersCount)) {
+    throw new Error(`小红书粉丝数字段缺失。user_id=${target.platformTargetId}`);
+  }
+
+  return {
+    followersCount,
+    rawPayload: {
+      user,
+    },
+  };
 };

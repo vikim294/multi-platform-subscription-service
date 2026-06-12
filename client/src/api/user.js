@@ -29,6 +29,10 @@ export const userApi = {
     const { data } = await http.get(`/targets/${targetId}/activities`, { params });
     return data;
   },
+  getTargetStats: async (targetId, params = {}) => {
+    const { data } = await http.get(`/targets/${targetId}/stats`, { params });
+    return data;
+  },
   listUnreadNotifications: async () => {
     const { data } = await http.get('/notifications/unread');
     return data;

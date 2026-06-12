@@ -5,12 +5,14 @@ import { initFetchLog, FetchLog } from './fetch-log.model.js';
 import { initPlatformToken, PlatformToken } from './platform-token.model.js';
 import { initScheduleTask, ScheduleTask } from './schedule-task.model.js';
 import { initTarget, Target } from './target.model.js';
+import { initTargetFollowerStat, TargetFollowerStat } from './target-follower-stat.model.js';
 import { initUser, User } from './user.model.js';
 import { initUserSubscription, UserSubscription } from './user-subscription.model.js';
 
 initUser(sequelize);
 initPlatformToken(sequelize);
 initTarget(sequelize);
+initTargetFollowerStat(sequelize);
 initActivity(sequelize);
 initActivityNotification(sequelize);
 initFetchLog(sequelize);
@@ -32,6 +34,9 @@ FetchLog.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
 
 Target.hasMany(ScheduleTask, { foreignKey: 'targetId', as: 'scheduleTasks' });
 ScheduleTask.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
+
+Target.hasMany(TargetFollowerStat, { foreignKey: 'targetId', as: 'followerStats' });
+TargetFollowerStat.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
 
 User.belongsToMany(Target, {
   through: UserSubscription,
@@ -59,6 +64,7 @@ export {
   PlatformToken,
   ScheduleTask,
   Target,
+  TargetFollowerStat,
   User,
   UserSubscription,
 };

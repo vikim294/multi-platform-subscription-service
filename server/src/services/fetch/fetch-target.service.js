@@ -2,6 +2,7 @@ import { Activity, FetchLog, PlatformToken } from '../../models/index.js';
 import { notifyNewActivity } from '../notifications/activity-notification.service.js';
 import { fetchWeiboTargetPage } from '../platforms/weibo.adapter.js';
 import { fetchXiaohongshuTargetPage } from '../platforms/xiaohongshu.adapter.js';
+import { captureFollowerStat } from '../stats/target-stats.service.js';
 
 const getAdapter = (platform) => {
   if (platform === 'weibo') return fetchWeiboTargetPage;
@@ -64,6 +65,11 @@ export const fetchTarget = async (target) => {
       }
     }
 
+    const followerStatResult = await captureFollowerStat(target).catch((error) => ({
+      status: 'failed',
+      message: error.message,
+    }));
+
     await FetchLog.create({
       targetId: target.id,
       platform: target.platform,
@@ -71,6 +77,10 @@ export const fetchTarget = async (target) => {
       pageCount: 1,
       fetchedCount: activities.length,
       insertedCount,
+      message:
+        followerStatResult.status === 'success' || followerStatResult.status === 'skipped'
+          ? null
+          : `follower_stat_failed:${followerStatResult.message}`,
       startedAt,
       finishedAt: new Date(),
     });

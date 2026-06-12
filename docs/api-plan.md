@@ -113,6 +113,41 @@ Unsubscribes current user from a target.
 
 Returns activities for one target.
 
+### GET `/targets/:id/stats`
+
+Returns target statistics for a date range. Defaults to the latest 7 days.
+
+Query:
+
+- `startDate`: optional, `YYYY-MM-DD`.
+- `endDate`: optional, `YYYY-MM-DD`.
+
+Response:
+
+```json
+{
+  "target": {
+    "id": 1,
+    "platform": "weibo",
+    "platformTargetId": "1234567890",
+    "name": "目标账号"
+  },
+  "startDate": "2026-06-06",
+  "endDate": "2026-06-12",
+  "rows": [
+    {
+      "statDate": "2026-06-12",
+      "followersCount": 10000,
+      "deltaCount": 12,
+      "activityCount": 3,
+      "capturedAt": "2026-06-12T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+Follower stats are captured after successful target fetches and persisted as daily snapshots. Post counts are calculated from stored activities by day.
+
 ## User Notifications
 
 New activity reminders are persisted as unread notifications and pushed to online users through SSE.

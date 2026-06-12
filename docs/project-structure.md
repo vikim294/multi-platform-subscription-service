@@ -22,6 +22,7 @@ mpss/
         index.js
         user.model.js
         user-subscription.model.js
+        target-follower-stat.model.js
         platform-token.model.js
         target.model.js
         activity.model.js
@@ -44,6 +45,8 @@ mpss/
         notifications/
           activity-notification.service.js
           sse-hub.service.js
+        stats/
+          target-stats.service.js
         fetch/
           fetch-target.service.js
           scheduler.service.js
@@ -79,6 +82,7 @@ mpss/
         SchedulerPage.jsx
       components/
         AppShellLayout.jsx
+        TargetStatsModal.jsx
         TargetForm.jsx
         ConfirmDeleteModal.jsx
       api/

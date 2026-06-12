@@ -1,5 +1,6 @@
 import {
   Anchor,
+  ActionIcon,
   Badge,
   Button,
   Indicator,
@@ -10,15 +11,24 @@ import {
   Table,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconBell, IconBellOff, IconLogout, IconRefresh, IconTimeline } from '@tabler/icons-react';
+import {
+  IconBell,
+  IconBellOff,
+  IconChartBar,
+  IconLogout,
+  IconRefresh,
+  IconTimeline,
+} from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { clearUserToken } from '../api/http.js';
 import { userApi } from '../api/user.js';
+import { TargetStatsModal } from '../components/TargetStatsModal.jsx';
 import { useNotificationStream } from '../hooks/useNotificationStream.js';
 import { getPlatformLabel, getTimeLabel } from '../utils/platform.js';
 
@@ -54,9 +64,12 @@ export const UserTargetsPage = () => {
   const [targets, setTargets] = useState([]);
   const [loadingTargetId, setLoadingTargetId] = useState(null);
   const [activityData, setActivityData] = useState({ target: null, items: [] });
+  const [statsData, setStatsData] = useState(null);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [opened, { open, close }] = useDisclosure(false);
+  const [statsOpened, { open: openStats, close: closeStats }] = useDisclosure(false);
   const navigate = useNavigate();
 
   const loadTargets = useCallback(async () => {
@@ -116,6 +129,20 @@ export const UserTargetsPage = () => {
     }
   };
 
+  const openStatsModal = async (target) => {
+    setStatsLoading(true);
+    setStatsData({ target, rows: [] });
+    openStats();
+    try {
+      const data = await userApi.getTargetStats(target.id);
+      setStatsData(data);
+    } catch (error) {
+      notifications.show({ color: 'red', message: error.response?.data?.error || error.message });
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   const logout = () => {
     clearUserToken();
     navigate('/login', { replace: true });
@@ -157,7 +184,9 @@ export const UserTargetsPage = () => {
                   <Table.Th>目标</Table.Th>
                   <Table.Th>平台</Table.Th>
                   <Table.Th>最新动态</Table.Th>
-                  <Table.Th ta="right">操作</Table.Th>
+                  <Table.Th ta="right" w={176}>
+                    操作
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -182,24 +211,41 @@ export const UserTargetsPage = () => {
                     <Table.Td maw={440}>
                       <ActivityPreview activity={target.latestActivity} />
                     </Table.Td>
-                    <Table.Td>
-                      <Group justify="flex-end" gap="xs">
+                    <Table.Td w={176}>
+                      <Group justify="flex-end" gap={6} wrap="nowrap">
                         <Button
                           variant={target.subscribed ? 'light' : 'filled'}
                           color={target.subscribed ? 'red' : 'blue'}
+                          size="xs"
+                          miw={88}
                           loading={loadingTargetId === target.id}
                           leftSection={target.subscribed ? <IconBellOff size={16} /> : <IconBell size={16} />}
                           onClick={() => toggleSubscription(target)}
                         >
                           {target.subscribed ? '取消订阅' : '订阅'}
                         </Button>
-                        <Button
-                          variant="light"
-                          leftSection={<IconTimeline size={16} />}
-                          onClick={() => openActivities(target)}
-                        >
-                          全部动态
-                        </Button>
+                        <Tooltip label="全部动态" withArrow>
+                          <ActionIcon
+                            variant="light"
+                            size={34}
+                            radius="md"
+                            aria-label="全部动态"
+                            onClick={() => openActivities(target)}
+                          >
+                            <IconTimeline size={18} />
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label="统计数据" withArrow>
+                          <ActionIcon
+                            variant="light"
+                            size={34}
+                            radius="md"
+                            aria-label="统计数据"
+                            onClick={() => openStatsModal(target)}
+                          >
+                            <IconChartBar size={18} />
+                          </ActionIcon>
+                        </Tooltip>
                       </Group>
                     </Table.Td>
                   </Table.Tr>
@@ -240,6 +286,7 @@ export const UserTargetsPage = () => {
             ))}
         </Stack>
       </Modal>
+      <TargetStatsModal opened={statsOpened} onClose={closeStats} loading={statsLoading} stats={statsData} />
     </main>
   );
 };

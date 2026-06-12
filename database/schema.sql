@@ -100,6 +100,25 @@ CREATE TABLE IF NOT EXISTS `fetch_logs` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `target_follower_stats` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `target_id` BIGINT UNSIGNED NOT NULL,
+  `stat_date` DATE NOT NULL,
+  `followers_count` INT UNSIGNED NOT NULL,
+  `delta_count` INT NULL,
+  `captured_at` DATETIME NOT NULL,
+  `raw_payload` JSON NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_target_follower_stats_target_date` (`target_id`, `stat_date`),
+  KEY `idx_target_follower_stats_target_captured` (`target_id`, `captured_at`),
+  CONSTRAINT `fk_target_follower_stats_target_id`
+    FOREIGN KEY (`target_id`) REFERENCES `targets` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `activity_notifications` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NOT NULL,

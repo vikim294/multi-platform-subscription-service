@@ -5,6 +5,7 @@ import {
   subscribeTarget,
   unsubscribeTarget,
 } from '../controllers/user/target.controller.js';
+import { getTargetStats } from '../controllers/user/stats.controller.js';
 import {
   listUnreadNotifications,
   markAllNotificationsRead,
@@ -23,6 +24,7 @@ userRoutes.get('/targets', listUserTargets);
 userRoutes.post('/subscriptions/:id', subscribeTarget);
 userRoutes.delete('/subscriptions/:id', unsubscribeTarget);
 userRoutes.get('/targets/:id/activities', listTargetActivities);
+userRoutes.get('/targets/:id/stats', getTargetStats);
 
 userRoutes.get('/notifications/unread', listUnreadNotifications);
 userRoutes.patch('/notifications/:id/read', markNotificationRead);
