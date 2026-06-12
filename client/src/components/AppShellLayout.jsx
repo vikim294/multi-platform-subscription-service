@@ -28,7 +28,7 @@ export const AppShellLayout = ({ children }) => {
 
   const logout = () => {
     clearAdminToken();
-    navigate('/login', { replace: true });
+    navigate('/admin/login', { replace: true });
   };
 
   return (

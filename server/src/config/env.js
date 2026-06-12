@@ -9,7 +9,7 @@ const repoRoot = path.resolve(serverRoot, '..');
 dotenv.config({ path: path.join(repoRoot, '.env') });
 dotenv.config({ path: path.join(serverRoot, '.env') });
 
-const required = ['ADMIN_TOKEN', 'DB_NAME', 'DB_USER'];
+const required = ['ADMIN_TOKEN', 'JWT_SECRET', 'DB_NAME', 'DB_USER'];
 
 for (const key of required) {
   if (!process.env[key]) {
@@ -27,6 +27,7 @@ export const env = {
   port: toInt(process.env.PORT, 3000),
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   adminToken: process.env.ADMIN_TOKEN,
+  jwtSecret: process.env.JWT_SECRET,
   db: {
     host: process.env.DB_HOST || '127.0.0.1',
     port: toInt(process.env.DB_PORT, 3306),

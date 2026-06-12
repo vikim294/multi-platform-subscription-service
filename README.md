@@ -1,6 +1,6 @@
 # MPSS MVP
 
-Multi-platform subscription service MVP. The first version only implements Weibo admin management and fetching.
+Multi-platform subscription service MVP. The first version implements Weibo admin management, fetching, and user subscriptions.
 
 ## Stack
 
@@ -39,8 +39,13 @@ pnpm dev:client
 Backend defaults to `http://localhost:3000`.
 Frontend defaults to `http://localhost:5173`.
 
+User frontend: `http://localhost:5173/login`
+Admin frontend: `http://localhost:5173/admin/login`
+
 ## MVP Scope
 
+- Users register/login with 6+ character alphanumeric account and password.
+- Users subscribe/unsubscribe targets and view latest or all activities.
 - Admin logs in with `ADMIN_TOKEN`.
 - Admin configures Weibo Cookie.
 - Admin creates and deletes targets with `name` and `platform_target_id`.

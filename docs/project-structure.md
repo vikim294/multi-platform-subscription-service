@@ -20,11 +20,15 @@ mpss/
         sequelize.js
       models/
         index.js
+        user.model.js
+        user-subscription.model.js
         platform-token.model.js
         target.model.js
         activity.model.js
         fetch-log.model.js
       routes/
+        auth.routes.js
+        user.routes.js
         admin.routes.js
         health.routes.js
       controllers/
@@ -56,6 +60,8 @@ mpss/
       routes/
         AdminRoutes.jsx
       pages/
+        UserAuthPage.jsx
+        UserTargetsPage.jsx
         AdminLogin.jsx
         AdminDashboard.jsx
         PlatformTokenPage.jsx

@@ -14,7 +14,7 @@ The first admin screen can store this token in `localStorage`. There is no separ
 
 ## Health
 
-### GET `/health`
+### GET `/api/health`
 
 Returns server and database health.
 
@@ -26,6 +26,92 @@ Response:
   "database": "ok"
 }
 ```
+
+## User Auth
+
+User authentication uses JWT returned from login/register.
+
+Client sends:
+
+```http
+Authorization: Bearer <JWT>
+```
+
+### POST `/auth/register`
+
+Request:
+
+```json
+{
+  "account": "user001",
+  "password": "pass001"
+}
+```
+
+Rules:
+
+- `account`: 6-64 characters, English letters or numbers only.
+- `password`: 6-64 characters, English letters or numbers only.
+
+Response:
+
+```json
+{
+  "token": "jwt",
+  "user": {
+    "id": 1,
+    "account": "user001"
+  }
+}
+```
+
+### POST `/auth/login`
+
+Same request and response as register.
+
+### GET `/auth/me`
+
+Returns current user profile.
+
+## User Targets
+
+### GET `/targets`
+
+Returns all subscribable targets. Subscribed targets are sorted first and each target includes its latest activity.
+
+Response:
+
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "platform": "weibo",
+      "platformTargetId": "1234567890",
+      "name": "目标账号",
+      "subscribed": true,
+      "latestActivity": {
+        "id": 10,
+        "content": "微博正文",
+        "sourceUrl": "https://weibo.com/1234567890/xxx",
+        "publishedAt": "2026-06-12T00:00:00.000Z"
+      }
+    }
+  ]
+}
+```
+
+### POST `/subscriptions/:id`
+
+Subscribes current user to a target.
+
+### DELETE `/subscriptions/:id`
+
+Unsubscribes current user from a target.
+
+### GET `/targets/:id/activities`
+
+Returns activities for one target.
 
 ## Admin Platform Tokens
 

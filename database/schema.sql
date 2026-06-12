@@ -4,6 +4,16 @@ CREATE DATABASE IF NOT EXISTS `mpss`
 
 USE `mpss`;
 
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `account` VARCHAR(64) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_users_account` (`account`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `platform_tokens` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `platform` ENUM('weibo', 'xiaohongshu', 'douyin') NOT NULL,
@@ -25,6 +35,25 @@ CREATE TABLE IF NOT EXISTS `targets` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_targets_platform_target` (`platform`, `platform_target_id`),
   KEY `idx_targets_platform` (`platform`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_subscriptions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `target_id` BIGINT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_subscriptions_user_target` (`user_id`, `target_id`),
+  KEY `idx_user_subscriptions_target` (`target_id`),
+  CONSTRAINT `fk_user_subscriptions_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_subscriptions_target_id`
+    FOREIGN KEY (`target_id`) REFERENCES `targets` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `activities` (
