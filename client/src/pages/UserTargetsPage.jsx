@@ -19,6 +19,7 @@ import {
   IconBell,
   IconBellOff,
   IconChartBar,
+  IconDownload,
   IconLogout,
   IconRefresh,
   IconTimeline,
@@ -32,6 +33,8 @@ import { TargetStatsModal } from '../components/TargetStatsModal.jsx';
 import { WeiboInsightsPanel } from '../components/WeiboInsightsPanel.jsx';
 import { useNotificationStream } from '../hooks/useNotificationStream.js';
 import { getPlatformLabel, getTimeLabel } from '../utils/platform.js';
+
+const browserExtensionDownloadUrl = import.meta.env.VITE_BROWSER_EXTENSION_DOWNLOAD_URL || '/downloads/mpss-browser-extension.zip';
 
 const ActivityPreview = ({ activity }) => {
   if (!activity) {
@@ -160,6 +163,15 @@ export const UserTargetsPage = () => {
             </Text>
           </div>
           <Group>
+            <Button
+              component="a"
+              href={browserExtensionDownloadUrl}
+              download
+              variant="light"
+              leftSection={<IconDownload size={18} />}
+            >
+              下载浏览器插件
+            </Button>
             <Indicator label={unreadCount} size={18} disabled={unreadCount === 0}>
               <Button variant="light" leftSection={<IconBell size={18} />} onClick={() => navigate('/notifications')}>
                 消息提醒

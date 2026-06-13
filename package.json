@@ -17,6 +17,7 @@
     "dev:extension": "pnpm --filter @mpss/browser-extension dev",
     "build": "pnpm --filter @mpss/client build",
     "build:extension": "pnpm --filter @mpss/browser-extension build",
+    "extension:zip": "pnpm build:extension && node scripts/package-extension.js",
     "start": "pnpm --filter @mpss/server start",
     "lint": "pnpm -r lint",
     "db:migrate": "pnpm --filter @mpss/server db:migrate",

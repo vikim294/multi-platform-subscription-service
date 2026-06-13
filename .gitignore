@@ -26,3 +26,4 @@ yarn-error.log*
 # Runtime temp
 tmp/
 temp/
+server/public/downloads/*.zip

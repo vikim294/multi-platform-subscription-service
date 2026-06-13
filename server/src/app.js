@@ -2,6 +2,7 @@ import cors from '@koa/cors';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
+import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,6 +17,7 @@ import { logger } from './utils/logger.js';
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const skillFilePath = path.resolve(currentDir, '../../SKILL.md');
+const extensionZipFilePath = path.resolve(currentDir, '../public/downloads/mpss-browser-extension.zip');
 
 export const createApp = () => {
   const app = new Koa();
@@ -32,6 +34,25 @@ export const createApp = () => {
   app.use(bodyParser({ jsonLimit: '2mb' }));
 
   app.use(async (ctx, next) => {
+    if (ctx.method === 'GET' && ctx.path === '/downloads/mpss-browser-extension.zip') {
+      try {
+        await fs.access(extensionZipFilePath);
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          ctx.status = 404;
+          ctx.type = 'text/plain; charset=utf-8';
+          ctx.body = 'Browser extension package not found. Run pnpm extension:zip first.';
+          return;
+        }
+        throw error;
+      }
+
+      ctx.attachment('mpss-browser-extension.zip');
+      ctx.type = 'application/zip';
+      ctx.body = createReadStream(extensionZipFilePath);
+      return;
+    }
+
     if (ctx.method !== 'GET' || ctx.path !== '/SKILL.md') {
       await next();
       return;

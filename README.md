@@ -124,3 +124,11 @@ pnpm build:extension
 ```
 
 Then load `browser-extension/dist` in Chrome's extension page. The first version supports visible Weibo, Xiaohongshu, and Douyin search/detail/comment content.
+
+To publish a downloadable package for users, run:
+
+```bash
+pnpm extension:zip
+```
+
+The script builds the extension and writes `server/public/downloads/mpss-browser-extension.zip`. The backend serves it at `/downloads/mpss-browser-extension.zip`, and the user dashboard includes a "下载浏览器插件" button pointing to that file. The zip is not committed to git.

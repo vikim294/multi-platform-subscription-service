@@ -14,6 +14,14 @@ export default defineConfig(({ mode }) => {
           target: apiTarget,
           changeOrigin: true,
         },
+        '/downloads': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
+        '/SKILL.md': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
       },
     },
   };
