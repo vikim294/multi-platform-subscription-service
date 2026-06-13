@@ -11,9 +11,10 @@
     "browser-extension"
   ],
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
+    "dev": "pnpm --parallel --filter @mpss/server --filter @mpss/client dev",
     "dev:server": "pnpm --filter @mpss/server dev",
     "dev:client": "pnpm --filter @mpss/client dev",
+    "dev:extension": "pnpm --filter @mpss/browser-extension dev",
     "build": "pnpm --filter @mpss/client build",
     "build:extension": "pnpm --filter @mpss/browser-extension build",
     "start": "pnpm --filter @mpss/server start",
