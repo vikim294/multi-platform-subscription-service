@@ -1,5 +1,6 @@
 import { Badge, Button, Group, Modal, Paper, Stack, Text, Textarea } from '@mantine/core';
 import { IconSparkles } from '@tabler/icons-react';
+import { MarkdownContent } from './MarkdownContent.jsx';
 
 const presets = ['总结核心观点', '有哪些高频话题？', '情绪倾向如何？'];
 
@@ -57,9 +58,13 @@ export const AiAnalysisModal = ({
             <Text fw={600} size="sm">
               {message.role === 'assistant' ? 'AI' : '你'}
             </Text>
-            <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-              {message.content}
-            </Text>
+            {message.role === 'assistant' ? (
+              <MarkdownContent markdown={message.content} />
+            ) : (
+              <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                {message.content}
+              </Text>
+            )}
           </Paper>
         ))}
       </Stack>

@@ -11,3 +11,60 @@ body,
 body {
   background: #f8fafc;
 }
+
+.markdown-content {
+  color: #111827;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content pre {
+  margin: 0 0 0.625rem;
+}
+
+.markdown-content :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.25rem;
+}
+
+.markdown-content li + li {
+  margin-top: 0.25rem;
+}
+
+.markdown-content code {
+  border-radius: 0.25rem;
+  background: #eef2ff;
+  padding: 0.0625rem 0.25rem;
+  color: #1e40af;
+  font-size: 0.8125rem;
+}
+
+.markdown-content pre {
+  overflow-x: auto;
+  border-radius: 0.375rem;
+  background: #0f172a;
+  padding: 0.625rem;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+  color: #e5e7eb;
+  white-space: pre;
+}
