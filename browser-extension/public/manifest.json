@@ -12,7 +12,7 @@
   "side_panel": {
     "default_path": "index.html"
   },
-  "permissions": ["activeTab", "sidePanel", "storage", "tabs"],
+  "permissions": ["activeTab", "identity", "sidePanel", "storage", "tabs"],
   "host_permissions": [
     "https://*.weibo.com/*",
     "https://s.weibo.com/*",

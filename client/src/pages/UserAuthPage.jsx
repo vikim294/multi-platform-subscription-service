@@ -1,6 +1,7 @@
 import {
   Button,
   Container,
+  Divider,
   Group,
   Paper,
   PasswordInput,
@@ -12,7 +13,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconLogin, IconUserPlus } from '@tabler/icons-react';
+import { IconLogin, IconSparkles, IconUserPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setUserToken } from '../api/http.js';
@@ -23,6 +24,7 @@ const credentialPattern = /^[A-Za-z0-9]{6,64}$/;
 export const UserAuthPage = () => {
   const [mode, setMode] = useState('login');
   const [loading, setLoading] = useState(false);
+  const [baizhiLoading, setBaizhiLoading] = useState(false);
   const navigate = useNavigate();
   const form = useForm({
     initialValues: {
@@ -51,6 +53,18 @@ export const UserAuthPage = () => {
       setLoading(false);
     }
   });
+
+  const loginWithBaizhi = async () => {
+    setBaizhiLoading(true);
+    try {
+      const data = await userApi.getBaizhiAuthorizeUrl();
+      if (!data.authorizeUrl) throw new Error('未获取到百智授权地址');
+      window.location.href = data.authorizeUrl;
+    } catch (error) {
+      notifications.show({ color: 'red', message: error.response?.data?.error || error.message });
+      setBaizhiLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -90,6 +104,19 @@ export const UserAuthPage = () => {
                   {mode === 'login' ? '登录' : '注册'}
                 </Button>
               </Group>
+
+              <Divider label="或" labelPosition="center" />
+
+              <Button
+                type="button"
+                variant="light"
+                fullWidth
+                loading={baizhiLoading}
+                leftSection={<IconSparkles size={18} />}
+                onClick={loginWithBaizhi}
+              >
+                使用百智账号登录
+              </Button>
             </Stack>
           </form>
         </Paper>

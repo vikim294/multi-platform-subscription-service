@@ -13,22 +13,25 @@ export const userAuth = async (ctx, next) => {
     return;
   }
 
+  let payload;
   try {
-    const payload = jwt.verify(token, env.jwtSecret);
-    const user = await User.findByPk(payload.sub, {
-      attributes: ['id', 'account'],
-    });
-
-    if (!user) {
-      ctx.status = 401;
-      ctx.body = { error: 'Unauthorized' };
-      return;
-    }
-
-    ctx.state.user = user;
-    await next();
+    payload = jwt.verify(token, env.jwtSecret);
   } catch {
     ctx.status = 401;
     ctx.body = { error: 'Unauthorized' };
+    return;
   }
+
+  const user = await User.findByPk(payload.sub, {
+    attributes: ['id', 'account'],
+  });
+
+  if (!user) {
+    ctx.status = 401;
+    ctx.body = { error: 'Unauthorized' };
+    return;
+  }
+
+  ctx.state.user = user;
+  await next();
 };

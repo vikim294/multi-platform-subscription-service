@@ -20,6 +20,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import {
   IconBrandWeibo,
+  IconCloudUpload,
   IconCopy,
   IconDownload,
   IconLogin,
@@ -102,6 +103,49 @@ export const App = () => {
     }
   };
 
+  const loginWithBaizhi = async () => {
+    if (!chromeApi.identity?.getRedirectURL) {
+      notifications.show({ color: 'red', message: '当前浏览器不支持插件 OAuth 登录' });
+      return;
+    }
+
+    setLoading('baizhi-login');
+    try {
+      const baseUrl = normalizeBaseUrl(settings.baseUrl);
+      const authorizeResponse = await fetch(`${baseUrl}/api/auth/baizhi/authorize?channel=extension`);
+      const authorizeData = await authorizeResponse.json().catch(() => null);
+      if (!authorizeResponse.ok) throw new Error(authorizeData?.error || '获取百智授权地址失败');
+      if (!authorizeData?.authorizeUrl) throw new Error('未获取到百智授权地址');
+
+      const callbackUrl = await launchBaizhiAuthInTab(authorizeData.authorizeUrl);
+      const temporaryToken = new URL(callbackUrl).searchParams.get('token');
+      if (!temporaryToken) throw new Error('百智授权失败：缺少临时 token');
+
+      const exchangeResponse = await fetch(`${baseUrl}/api/auth/baizhi/exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: temporaryToken }),
+      });
+      const exchangeData = await exchangeResponse.json().catch(() => null);
+      if (!exchangeResponse.ok) throw new Error(exchangeData?.error || '百智登录失败');
+
+      const nextSettings = {
+        ...settings,
+        baseUrl,
+        account: exchangeData.user?.account || settings.account,
+        token: exchangeData.token,
+      };
+      await chromeApi.storage.local.set(nextSettings);
+      setSettings(nextSettings);
+      setPassword('');
+      notifications.show({ color: 'green', message: '百智登录成功' });
+    } catch (error) {
+      notifications.show({ color: 'red', message: readableError(error) });
+    } finally {
+      setLoading('');
+    }
+  };
+
   const logout = async () => {
     await chromeApi.storage.local.remove('token');
     setSettings((current) => ({ ...current, token: '' }));
@@ -176,7 +220,7 @@ export const App = () => {
       if (response.status === 401 && data?.error === 'Unauthorized') {
         await chromeApi.storage.local.remove('token');
         setSettings((current) => ({ ...current, token: '' }));
-        throw new Error('登录已过期，请重新登录');
+        throw new Error('MPSS 登录态已过期，请重新登录');
       }
       if (!response.ok) throw new Error(data?.error || '分析失败');
 
@@ -208,6 +252,52 @@ export const App = () => {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const syncMarkdownToKnowledgeBase = async () => {
+    const markdown = buildMarkdown({ scrape, selectedItems, question, answer });
+    if (!markdown) return;
+    const latestSettings = await loadSettings();
+    const token = latestSettings.token || settings.token;
+    const baseUrl = normalizeBaseUrl(latestSettings.baseUrl || settings.baseUrl);
+
+    if (!token) {
+      setSettings((current) => ({ ...current, ...latestSettings, token: '' }));
+      notifications.show({ color: 'red', message: '请先登录' });
+      return;
+    }
+    if (token !== settings.token || baseUrl !== settings.baseUrl) {
+      setSettings((current) => ({ ...current, ...latestSettings, token, baseUrl }));
+    }
+
+    setLoading('kb-sync');
+    try {
+      const response = await fetch(`${baseUrl}/api/extension/knowledge-base/sync-markdown`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          markdown,
+          title: buildMarkdownTitle(scrape),
+          source: scrape?.source || 'extension',
+        }),
+      });
+      const data = await response.json().catch(() => null);
+      if (response.status === 401 && data?.error === 'Unauthorized') {
+        await chromeApi.storage.local.remove('token');
+        setSettings((current) => ({ ...current, token: '' }));
+        throw new Error('MPSS 登录态已过期，请重新登录');
+      }
+      if (!response.ok) throw new Error(data?.error || '同步到知识库失败');
+
+      notifications.show({ color: 'green', message: '已同步到百智知识库' });
+    } catch (error) {
+      notifications.show({ color: 'red', message: readableError(error) });
+    } finally {
+      setLoading('');
+    }
   };
 
   const toggleItem = (key, checked) => {
@@ -328,6 +418,11 @@ export const App = () => {
                     <Stack>
                       <MarkdownContent markdown={answer} />
                       <Group justify="flex-end">
+                        <Tooltip label="同步到百智知识库">
+                          <ActionIcon variant="light" loading={loading === 'kb-sync'} onClick={syncMarkdownToKnowledgeBase}>
+                            <IconCloudUpload size={17} />
+                          </ActionIcon>
+                        </Tooltip>
                         <Tooltip label="复制 Markdown">
                           <ActionIcon variant="light" onClick={copyMarkdown}>
                             <IconCopy size={17} />
@@ -378,6 +473,14 @@ export const App = () => {
                   登录
                 </Button>
               </Group>
+              <Button
+                variant="light"
+                leftSection={<IconSparkles size={16} />}
+                loading={loading === 'baizhi-login'}
+                onClick={loginWithBaizhi}
+              >
+                使用百智账号登录
+              </Button>
               <Button variant="subtle" color="red" leftSection={<IconLogout size={16} />} disabled={!loggedIn} onClick={logout}>
                 退出登录
               </Button>
@@ -409,6 +512,68 @@ const normalizeLimit = (value) => {
   return Math.min(parsed, MAX_LIMIT);
 };
 
+const launchBaizhiAuthInTab = async (url) => {
+  const redirectUrl = chromeApi.identity.getRedirectURL('baizhi');
+
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+    let openedTabId = null;
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error('百智登录超时，请重试'));
+    }, 3 * 60 * 1000);
+    const pollId = globalThis.setInterval(() => {
+      void findCallbackTab();
+    }, 500);
+
+    const cleanup = () => {
+      globalThis.clearTimeout(timeoutId);
+      globalThis.clearInterval(pollId);
+      chromeApi.tabs.onUpdated.removeListener(handleUpdated);
+      chromeApi.tabs.onRemoved.removeListener(handleRemoved);
+    };
+
+    const finish = (tabId, nextUrl) => {
+      if (resolved) return;
+      resolved = true;
+      cleanup();
+      if (tabId) chromeApi.tabs.remove(tabId).catch(() => {});
+      resolve(nextUrl);
+    };
+
+    const handleUpdated = (tabId, changeInfo, updatedTab) => {
+      const nextUrl = changeInfo.url || updatedTab.url || '';
+      if (!nextUrl.startsWith(redirectUrl)) return;
+      finish(tabId, nextUrl);
+    };
+
+    const handleRemoved = (tabId) => {
+      if (tabId !== openedTabId || resolved) return;
+      cleanup();
+      reject(new Error('已取消百智登录'));
+    };
+
+    const findCallbackTab = async () => {
+      const tabs = await chromeApi.tabs.query({});
+      const callbackTab = tabs.find((item) => item.url?.startsWith(redirectUrl));
+      if (callbackTab?.url) finish(callbackTab.id, callbackTab.url);
+    };
+
+    chromeApi.tabs.onUpdated.addListener(handleUpdated);
+    chromeApi.tabs.onRemoved.addListener(handleRemoved);
+    chromeApi.tabs
+      .create({ url, active: true })
+      .then((tab) => {
+        openedTabId = tab.id;
+        void findCallbackTab();
+      })
+      .catch((error) => {
+        cleanup();
+        reject(error);
+      });
+  });
+};
+
 const itemKey = (item, index) => item.platformCommentId || item.platformPostId || item.url || `${item.type}-${index}`;
 
 const stripTimeLine = (text) =>
@@ -434,11 +599,22 @@ const readableError = (error) => {
     missing_ai_api_key: 'AI 服务未配置',
     missing_question: '请输入问题',
     missing_extension_items: '当前没有可分析的页面内容',
+    missing_baizhi_authorization: '请先使用百智账号登录',
+    baizhi_authorization_expired: '百智授权已过期，请重新使用百智账号登录',
+    baizhi_knowledge_base_storage_insufficient: '百智知识库存储空间不足',
+    baizhi_knowledge_base_permission_denied: '没有权限写入百智知识库',
+    baizhi_knowledge_base_sync_failed: '同步到百智知识库失败',
+    baizhi_knowledge_base_network_error: '百智知识库服务暂时不可用',
     rate_limit_exceeded: '请求太频繁，请稍后再试',
     Unauthorized: '登录已过期，请重新登录',
   };
   return map[error?.message] || error?.message || '操作失败';
 };
+
+const buildMarkdownTitle = (scrape) =>
+  ['MPSS AI 分析', scrape?.source, pageTypeLabel(scrape?.pageType)]
+    .filter(Boolean)
+    .join(' - ');
 
 const buildMarkdown = ({ scrape, selectedItems, question, answer }) => {
   if (!scrape?.items?.length || !answer) return '';

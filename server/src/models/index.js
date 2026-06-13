@@ -2,6 +2,7 @@ import { sequelize } from '../config/sequelize.js';
 import { initActivityNotification, ActivityNotification } from './activity-notification.model.js';
 import { initActivity, Activity } from './activity.model.js';
 import { initFetchLog, FetchLog } from './fetch-log.model.js';
+import { initOAuthAccount, OAuthAccount } from './oauth-account.model.js';
 import { initPlatformToken, PlatformToken } from './platform-token.model.js';
 import { initScheduleTask, ScheduleTask } from './schedule-task.model.js';
 import { initTarget, Target } from './target.model.js';
@@ -11,6 +12,7 @@ import { initUser, User } from './user.model.js';
 import { initUserSubscription, UserSubscription } from './user-subscription.model.js';
 
 initUser(sequelize);
+initOAuthAccount(sequelize);
 initPlatformToken(sequelize);
 initTarget(sequelize);
 initTargetFollowerStat(sequelize);
@@ -26,6 +28,9 @@ Activity.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
 
 User.hasMany(ActivityNotification, { foreignKey: 'userId', as: 'activityNotifications' });
 ActivityNotification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+User.hasMany(OAuthAccount, { foreignKey: 'userId', as: 'oauthAccounts' });
+OAuthAccount.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 Target.hasMany(ActivityNotification, { foreignKey: 'targetId', as: 'activityNotifications' });
 ActivityNotification.belongsTo(Target, { foreignKey: 'targetId', as: 'target' });
 Activity.hasMany(ActivityNotification, { foreignKey: 'activityId', as: 'notifications' });
@@ -66,6 +71,7 @@ export {
   Activity,
   ActivityNotification,
   FetchLog,
+  OAuthAccount,
   PlatformToken,
   ScheduleTask,
   Target,

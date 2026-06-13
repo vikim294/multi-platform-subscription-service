@@ -73,6 +73,38 @@ AI_TIMEOUT_MS=30000
 
 If `AI_API_KEY` is empty, analysis endpoints return `missing_ai_api_key`.
 
+## Baizhi OAuth
+
+User login supports the existing account/password flow and optional Baizhi OAuth login. Configure these only when Baizhi login is needed:
+
+```bash
+BAIZHI_BASE_URL=https://openapi.100wiser.com
+BAIZHI_OAUTH_BASE_URL=https://100wiser.com
+BAIZHI_KNOWLEDGE_BASE_URL=https://100wiser.com/facade
+BAIZHI_APP_ID=
+BAIZHI_APP_SECRET=
+BAIZHI_APP_NAME=
+BAIZHI_EXTENSION_APP_ID=
+BAIZHI_EXTENSION_APP_SECRET=
+BAIZHI_EXTENSION_APP_NAME=mpss-extension
+```
+
+Set the Baizhi Web application redirect URL to the frontend callback route, for example:
+
+```text
+http://localhost:5173/oauth/baizhi/callback
+```
+
+For browser extension login, create a second Baizhi application and set its redirect URL to the Chrome extension OAuth callback:
+
+```text
+https://<extension-id>.chromiumapp.org/baizhi
+```
+
+The extension ID is shown in `chrome://extensions` after loading the extension.
+
+The browser extension can also sync its captured content and AI analysis Markdown to Baizhi Knowledge Base. This requires the user to log in with Baizhi first, so the server can use the stored Baizhi access token. The first implementation writes Markdown into the user's Baizhi personal Knowledge Base under the `MPSS` folder using the `mpss-extension` vault.
+
 ## Browser Extension
 
 The Chrome MV3 extension lives in `browser-extension/` and uses React + Mantine for the side panel UI. Build it with:

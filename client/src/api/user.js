@@ -9,6 +9,14 @@ export const userApi = {
     const { data } = await http.post('/auth/login', payload);
     return data;
   },
+  getBaizhiAuthorizeUrl: async () => {
+    const { data } = await http.get('/auth/baizhi/authorize');
+    return data;
+  },
+  exchangeBaizhiToken: async (token) => {
+    const { data } = await http.post('/auth/baizhi/exchange', { token });
+    return data;
+  },
   me: async () => {
     const { data } = await http.get('/auth/me');
     return data;

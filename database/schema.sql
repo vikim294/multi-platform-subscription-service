@@ -7,11 +7,29 @@ USE `mpss`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `account` VARCHAR(64) NOT NULL,
-  `password_hash` VARCHAR(255) NOT NULL,
+  `password_hash` VARCHAR(255) NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_users_account` (`account`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `oauth_accounts` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `provider` VARCHAR(32) NOT NULL,
+  `provider_user_id` VARCHAR(128) NOT NULL,
+  `access_token` TEXT NULL,
+  `profile_json` JSON NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_oauth_accounts_provider_user` (`provider`, `provider_user_id`),
+  KEY `idx_oauth_accounts_user` (`user_id`),
+  CONSTRAINT `fk_oauth_accounts_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `platform_tokens` (

@@ -50,6 +50,17 @@ export const env = {
     model: process.env.AI_MODEL || 'deepseek-chat',
     timeoutMs: toInt(process.env.AI_TIMEOUT_MS, 30000),
   },
+  baizhi: {
+    baseUrl: (process.env.BAIZHI_BASE_URL || 'https://openapi.100wiser.com').replace(/\/+$/, ''),
+    oauthBaseUrl: (process.env.BAIZHI_OAUTH_BASE_URL || 'https://100wiser.com').replace(/\/+$/, ''),
+    knowledgeBaseUrl: (process.env.BAIZHI_KNOWLEDGE_BASE_URL || 'https://100wiser.com/facade').replace(/\/+$/, ''),
+    appId: process.env.BAIZHI_APP_ID || '',
+    appSecret: process.env.BAIZHI_APP_SECRET || '',
+    appName: process.env.BAIZHI_APP_NAME || '',
+    extensionAppId: process.env.BAIZHI_EXTENSION_APP_ID || '',
+    extensionAppSecret: process.env.BAIZHI_EXTENSION_APP_SECRET || '',
+    extensionAppName: process.env.BAIZHI_EXTENSION_APP_NAME || '',
+  },
   rateLimits: {
     search: {
       windowMs: toInt(process.env.RATE_LIMIT_SEARCH_WINDOW_MS, 10 * 60 * 1000),

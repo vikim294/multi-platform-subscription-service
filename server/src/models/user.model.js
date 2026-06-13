@@ -17,7 +17,7 @@ export const initUser = (sequelize) => {
       },
       passwordHash: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
         field: 'password_hash',
       },
     },

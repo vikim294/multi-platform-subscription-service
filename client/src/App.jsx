@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { AdminRoutes } from './routes/AdminRoutes.jsx';
 import { AdminLogin } from './pages/AdminLogin.jsx';
+import { BaizhiOAuthCallbackPage } from './pages/BaizhiOAuthCallbackPage.jsx';
 import { UserAuthPage } from './pages/UserAuthPage.jsx';
 import { UserNotificationsPage } from './pages/UserNotificationsPage.jsx';
 import { UserTargetsPage } from './pages/UserTargetsPage.jsx';
@@ -30,6 +31,7 @@ export const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<UserAuthPage />} />
+      <Route path="/oauth/baizhi/callback" element={<BaizhiOAuthCallbackPage />} />
       <Route path="/app" element={userToken ? <UserTargetsPage /> : <Navigate to="/login" replace />} />
       <Route path="/notifications" element={userToken ? <UserNotificationsPage /> : <Navigate to="/login" replace />} />
       <Route path="/admin/login" element={<AdminLogin />} />

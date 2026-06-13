@@ -1,5 +1,6 @@
 import { env } from '../../config/env.js';
 import { userRateLimit } from '../../middleware/user-rate-limit.js';
+import { syncMarkdownToBaizhiKnowledgeBase } from '../../services/baizhi/knowledge-base.service.js';
 import { askExtensionContent, askPostComments, askSearchResults } from '../../services/ai/ai-analysis.service.js';
 import { listTargetPosts, listWeiboPostComments } from '../../services/comments/post-comment.service.js';
 import {
@@ -49,6 +50,17 @@ export const askExtension = async (ctx) => {
     question: ctx.request.body.question,
     items: ctx.request.body.items,
   });
+};
+
+export const syncExtensionMarkdown = async (ctx) => {
+  ctx.body = {
+    synced: await syncMarkdownToBaizhiKnowledgeBase({
+      userId: ctx.state.user.id,
+      markdown: ctx.request.body.markdown,
+      title: ctx.request.body.title,
+      source: ctx.request.body.source,
+    }),
+  };
 };
 
 export const getSearchHistories = async (ctx) => {
