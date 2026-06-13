@@ -106,12 +106,16 @@
 
   function parseComment(node, parentComment = null) {
     const author = cleanText(node.querySelector('.author .name, a.name')?.innerText);
-    const content = readNoteText(node.querySelector('.content .note-text')) || cleanText(node.querySelector('.content')?.innerText);
+    const contentRoot = node.querySelector('.content');
+    const rawContent = cleanText(contentRoot?.innerText);
+    const noteText = readNoteText(node.querySelector('.content .note-text'));
     const date = cleanText(node.querySelector('.info .date')?.innerText);
     const likeText = cleanText(node.querySelector('.interactions .like .count, .like-wrapper .count')?.innerText);
     const replyText = cleanText(node.querySelector('.reply .count')?.innerText);
     const id = node.id || '';
     const isReply = node.classList.contains('comment-item-sub');
+    const explicitReplyAuthor = isReply ? readExplicitReplyAuthor(contentRoot, rawContent) : '';
+    const content = noteText || stripReplyPrefix(rawContent, explicitReplyAuthor);
 
     if (!content || isExpansionText(content)) return null;
     return {
@@ -120,6 +124,9 @@
       parentCommentId: parentComment?.platformCommentId || '',
       parentCommentAuthor: parentComment?.author || '',
       parentCommentText: parentComment?.text ? stripTimeLine(parentComment.text) : '',
+      replyToCommentId: '',
+      replyToCommentAuthor: explicitReplyAuthor,
+      replyToCommentText: '',
       title: author ? `${author} 的评论` : '评论',
       text: [content, date ? `时间：${date}` : ''].filter(Boolean).join('\n'),
       author,
@@ -134,6 +141,19 @@
   function readNoteText(node) {
     if (!node) return '';
     return cleanText([...node.querySelectorAll('span')].map((span) => span.textContent).join('')) || cleanText(node.textContent);
+  }
+
+  function readExplicitReplyAuthor(contentRoot, rawContent) {
+    const linkText = cleanText(contentRoot?.querySelector('a[href*="/user/profile/"], a.name')?.innerText);
+    if (linkText) return linkText.replace(/^回复\s*/, '').replace(/[:：]$/, '').trim();
+
+    const match = cleanText(rawContent).match(/^回复\s*([^:：\n]+)\s*[:：]/);
+    return cleanText(match?.[1]);
+  }
+
+  function stripReplyPrefix(text, replyAuthor) {
+    if (!replyAuthor) return cleanText(text);
+    return cleanText(text).replace(new RegExp(`^回复\\s*${escapeRegExp(replyAuthor)}\\s*[:：]\\s*`), '');
   }
 
   function stripTimeLine(text) {
@@ -153,5 +173,9 @@
     const parsed = Number(value || 30);
     if (!Number.isInteger(parsed) || parsed <= 0) return 30;
     return Math.min(parsed, 100);
+  }
+
+  function escapeRegExp(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 })();

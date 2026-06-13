@@ -50,7 +50,7 @@
     }
 
     const parentById = new Map(comments.map((comment) => [comment.platformCommentId, comment]));
-    const normalizedReplies = replies.map((reply) => attachParentComment(reply, parentById));
+    const normalizedReplies = replies.map((reply) => attachParentComment(resolveReplyParent(reply, parentById), parentById));
     return dedupeItems(interleaveReplies(comments, normalizedReplies));
   }
 
@@ -83,7 +83,14 @@
     const cid = String(reply?.cid || '');
     if (!text || !cid) return null;
 
-    const parentCommentId = readQuery(entry.url, 'comment_id') || String(reply?.reply_id || reply?.reply_to_reply_id || '');
+    const parentCommentIdCandidates = uniqueIds([
+      readQuery(entry.url, 'comment_id'),
+      reply?.root_comment_id,
+      reply?.reply_id,
+    ]);
+    const parentCommentId = parentCommentIdCandidates[0] || '';
+    const replyToCommentId = firstValidId([reply?.reply_to_reply_id]);
+    const replyToCommentAuthor = readReplyToAuthor(reply);
     const author = cleanText(reply?.user?.nickname);
     const timeText = formatTime(reply?.create_time, reply?.ip_label);
     const postId = String(reply?.aweme_id || readQuery(entry.url, 'item_id') || readQuery(entry.url, 'aweme_id') || '');
@@ -93,8 +100,12 @@
       platformCommentId: cid,
       platformPostId: postId,
       parentCommentId,
+      parentCommentIdCandidates,
       parentCommentAuthor: '',
       parentCommentText: '',
+      replyToCommentId,
+      replyToCommentAuthor,
+      replyToCommentText: '',
       title: author ? `${author} 的回复` : '回复',
       text: [text, timeText ? `时间：${timeText}` : ''].filter(Boolean).join('\n'),
       author,
@@ -106,13 +117,25 @@
     };
   }
 
+  function resolveReplyParent(reply, parentById) {
+    const matchedParentId = (reply.parentCommentIdCandidates || []).find((id) => parentById.has(id));
+    if (!matchedParentId || matchedParentId === reply.parentCommentId) return reply;
+    return {
+      ...reply,
+      parentCommentId: matchedParentId,
+    };
+  }
+
   function attachParentComment(reply, parentById) {
     const parentComment = parentById.get(reply.parentCommentId);
     if (!parentComment) return reply;
+    const isReplyToParent = !reply.replyToCommentId || reply.replyToCommentId === parentComment.platformCommentId;
     return {
       ...reply,
       parentCommentAuthor: parentComment.author || '',
       parentCommentText: stripTimeLine(parentComment.text),
+      replyToCommentAuthor: reply.replyToCommentAuthor || (isReplyToParent ? parentComment.author || '' : ''),
+      replyToCommentText: reply.replyToCommentText || (isReplyToParent ? stripTimeLine(parentComment.text) : ''),
     };
   }
 
@@ -223,6 +246,34 @@
   function readCurrentPostId() {
     const node = findVisibleElement('[data-e2e-aweme-id]');
     return cleanText(node?.getAttribute('data-e2e-aweme-id')) || readPostIdFromUrl();
+  }
+
+  function readReplyToAuthor(reply) {
+    const candidates = [
+      reply?.reply_to_user?.nickname,
+      reply?.reply_to_user?.name,
+      reply?.reply_to_user_name,
+      reply?.reply_to_user_nickname,
+      reply?.reply_to_username,
+      reply?.reply_user?.nickname,
+      reply?.reply_user?.name,
+      reply?.reply_to_user_info?.nickname,
+      reply?.reply_to_user_info?.name,
+    ];
+    return cleanText(candidates.find(Boolean));
+  }
+
+  function uniqueIds(values) {
+    return [...new Set(values.map(normalizeId).filter(Boolean))];
+  }
+
+  function firstValidId(values) {
+    return values.map(normalizeId).find(Boolean) || '';
+  }
+
+  function normalizeId(value) {
+    const normalized = String(value || '').trim();
+    return normalized && normalized !== '0' ? normalized : '';
   }
 
   function isCurrentEntry(entry, comments, currentPostId) {

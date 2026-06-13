@@ -363,6 +363,7 @@ export const App = () => {
                       )}
                       {scrape?.items?.map((item, index) => {
                         const key = itemKey(item, index);
+                        const relationLines = getItemRelationLines(item);
                         return (
                           <Paper key={key} withBorder radius="md" p="xs" className="item-card">
                             <Group align="flex-start" wrap="nowrap">
@@ -376,11 +377,11 @@ export const App = () => {
                                     {item.author || '未知作者'}
                                   </Text>
                                 </Group>
-                                {item.parentTitle && (
-                                  <Text size="xs" c="dimmed" lineClamp={1}>
-                                    所属：{item.parentTitle}
+                                {relationLines.map((line) => (
+                                  <Text key={line} size="xs" c="dimmed" lineClamp={1} className="item-relation">
+                                    {line}
                                   </Text>
-                                )}
+                                ))}
                                 <Text size="sm" lineClamp={3}>
                                   {stripTimeLine(item.text || item.title || '无内容')}
                                 </Text>
@@ -583,6 +584,30 @@ const stripTimeLine = (text) =>
     .join('\n')
     .trim();
 
+const getItemRelationLines = (item) => {
+  const lines = [];
+
+  if (item.parentTitle) {
+    lines.push(`所属：${[item.parentAuthor, item.parentTitle].filter(Boolean).join(' · ')}`);
+  } else if (item.parentUrl && item.parentUrl !== item.url) {
+    lines.push(`所属：${item.parentUrl}`);
+  }
+
+  if (item.replyToCommentText) {
+    const prefix = item.replyToCommentAuthor ? `${item.replyToCommentAuthor}：` : '';
+    lines.push(`回复：${prefix}${stripTimeLine(item.replyToCommentText)}`);
+  } else if (item.replyToCommentAuthor) {
+    lines.push(`回复：${item.replyToCommentAuthor}`);
+  } else if (item.parentCommentText) {
+    const prefix = item.parentCommentAuthor ? `${item.parentCommentAuthor}：` : '';
+    lines.push(`回复：${prefix}${stripTimeLine(item.parentCommentText)}`);
+  } else if (item.parentCommentAuthor) {
+    lines.push(`回复：${item.parentCommentAuthor}`);
+  }
+
+  return lines.filter(Boolean);
+};
+
 const pageTypeLabel = (value) => {
   const labels = {
     search_results: '搜索结果页',
@@ -643,7 +668,9 @@ const buildMarkdown = ({ scrape, selectedItems, question, answer }) => {
   selectedItems.forEach((item, index) => {
     lines.push(`### ${index + 1}. ${item.title || stripTimeLine(item.text) || '无标题'}`, '');
     if (item.author) lines.push(`- 作者：${item.author}`);
-    if (item.parentTitle) lines.push(`- 所属：${item.parentTitle}`);
+    for (const relationLine of getItemRelationLines(item)) {
+      lines.push(`- ${relationLine}`);
+    }
     if (item.url) lines.push(`- 链接：${item.url}`);
     lines.push('', '```text', stripTimeLine(item.text || item.title || '无内容'), '```', '');
   });

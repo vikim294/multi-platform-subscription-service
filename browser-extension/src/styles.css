@@ -36,6 +36,11 @@ body {
   transform: translateY(-1px);
 }
 
+.item-relation {
+  border-left: 2px solid #bfdbfe;
+  padding-left: 6px;
+}
+
 .markdown-content {
   font-size: 13px;
   line-height: 1.55;
