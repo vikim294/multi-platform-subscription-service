@@ -364,6 +364,7 @@ export const App = () => {
                       {scrape?.items?.map((item, index) => {
                         const key = itemKey(item, index);
                         const relationLines = getItemRelationLines(item);
+                        const { body, timeText } = splitTimeLine(item.text || item.title || '无内容');
                         return (
                           <Paper key={key} withBorder radius="md" p="xs" className="item-card">
                             <Group align="flex-start" wrap="nowrap">
@@ -383,8 +384,13 @@ export const App = () => {
                                   </Text>
                                 ))}
                                 <Text size="sm" lineClamp={3}>
-                                  {stripTimeLine(item.text || item.title || '无内容')}
+                                  {body || item.title || '无内容'}
                                 </Text>
+                                {timeText && (
+                                  <Text size="xs" c="dimmed" lineClamp={1} className="item-time">
+                                    {timeText}
+                                  </Text>
+                                )}
                               </Stack>
                             </Group>
                           </Paper>
@@ -578,11 +584,17 @@ const launchBaizhiAuthInTab = async (url) => {
 const itemKey = (item, index) => item.platformCommentId || item.platformPostId || item.url || `${item.type}-${index}`;
 
 const stripTimeLine = (text) =>
-  String(text || '')
-    .split('\n')
-    .filter((line) => !/^时间[:：]/.test(line.trim()))
-    .join('\n')
-    .trim();
+  splitTimeLine(text).body;
+
+const splitTimeLine = (text) => {
+  const lines = String(text || '').split('\n');
+  const timeIndex = lines.findIndex((line) => /^时间[:：]/.test(line.trim()));
+  if (timeIndex < 0) return { body: String(text || '').trim(), timeText: '' };
+  return {
+    body: lines.filter((_, index) => index !== timeIndex).join('\n').trim(),
+    timeText: lines[timeIndex].trim(),
+  };
+};
 
 const getItemRelationLines = (item) => {
   const lines = [];
@@ -666,13 +678,15 @@ const buildMarkdown = ({ scrape, selectedItems, question, answer }) => {
   ];
 
   selectedItems.forEach((item, index) => {
-    lines.push(`### ${index + 1}. ${item.title || stripTimeLine(item.text) || '无标题'}`, '');
+    const { body, timeText } = splitTimeLine(item.text || item.title || '');
+    lines.push(`### ${index + 1}. ${item.title || body || '无标题'}`, '');
     if (item.author) lines.push(`- 作者：${item.author}`);
+    if (timeText) lines.push(`- ${timeText}`);
     for (const relationLine of getItemRelationLines(item)) {
       lines.push(`- ${relationLine}`);
     }
     if (item.url) lines.push(`- 链接：${item.url}`);
-    lines.push('', '```text', stripTimeLine(item.text || item.title || '无内容'), '```', '');
+    lines.push('', '```text', body || item.title || '无内容', '```', '');
   });
 
   return `${lines.join('\n').trim()}\n`;
