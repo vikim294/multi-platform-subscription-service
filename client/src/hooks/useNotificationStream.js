@@ -10,7 +10,7 @@ export const useNotificationStream = (onNewActivity) => {
     const token = getUserToken();
     if (!token) return undefined;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
     const source = new EventSource(`${baseUrl}/notifications/stream?token=${encodeURIComponent(token)}`);
 
     source.addEventListener('new-activity', (event) => {
