@@ -105,6 +105,16 @@ The extension ID is shown in `chrome://extensions` after loading the extension.
 
 The browser extension can also sync its captured content and AI analysis Markdown to Baizhi Knowledge Base. This requires the user to log in with Baizhi first, so the server can use the stored Baizhi access token. The first implementation writes Markdown into the user's Baizhi personal Knowledge Base under the `MPSS` folder using the `mpss-extension` vault.
 
+## AI Agent Skill
+
+The repository includes a user-facing AI agent skill document at `SKILL.md`. When the backend is running, it is also served as Markdown:
+
+```text
+http://localhost:3000/SKILL.md
+```
+
+Agents can use this document to help users register or log in, subscribe to targets, inspect Weibo insights, run AI analysis, and sync Markdown analysis results to Baizhi Knowledge Base.
+
 ## Browser Extension
 
 The Chrome MV3 extension lives in `browser-extension/` and uses React + Mantine for the side panel UI. Build it with:

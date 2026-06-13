@@ -2,6 +2,9 @@ import cors from '@koa/cors';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { UniqueConstraintError } from 'sequelize';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error-handler.js';
@@ -10,6 +13,9 @@ import { authRoutes } from './routes/auth.routes.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { userRoutes } from './routes/user.routes.js';
 import { logger } from './utils/logger.js';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const skillFilePath = path.resolve(currentDir, '../../SKILL.md');
 
 export const createApp = () => {
   const app = new Koa();
@@ -24,6 +30,17 @@ export const createApp = () => {
   );
   app.use(helmet());
   app.use(bodyParser({ jsonLimit: '2mb' }));
+
+  app.use(async (ctx, next) => {
+    if (ctx.method !== 'GET' || ctx.path !== '/SKILL.md') {
+      await next();
+      return;
+    }
+
+    ctx.type = 'text/markdown; charset=utf-8';
+    ctx.set('Cache-Control', 'no-cache');
+    ctx.body = await fs.readFile(skillFilePath, 'utf8');
+  });
 
   app.use(healthRoutes.routes());
   app.use(healthRoutes.allowedMethods());
